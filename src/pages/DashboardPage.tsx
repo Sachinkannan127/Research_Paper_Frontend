@@ -27,6 +27,7 @@ export const DashboardPage: React.FC = () => {
   // Renaming State
   const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
   const [editingTitle, setEditingTitle] = useState('');
+  const [showSessions, setShowSessions] = useState(false);
 
   // Auto-scroll to bottom of thread
   useEffect(() => {
@@ -116,10 +117,18 @@ export const DashboardPage: React.FC = () => {
 
   return (
     <div className={styles.container}>
+      {/* Mobile subSidebar backdrop overlay */}
+      {showSessions && (
+        <div 
+          className={styles.subSidebarBackdrop} 
+          onClick={() => setShowSessions(false)} 
+        />
+      )}
+
       {/* Sub Sidebar: Chat sessions list */}
-      <aside className={styles.subSidebar}>
+      <aside className={`${styles.subSidebar} ${showSessions ? styles.subSidebarOpen : ''}`}>
         <div className={styles.subSidebarHeader}>
-          <button className={styles.newChatBtn} onClick={() => createSession()}>
+          <button className={styles.newChatBtn} onClick={() => { createSession(); setShowSessions(false); }}>
             <Plus size={16} />
             <span>New Chat</span>
           </button>
@@ -134,7 +143,12 @@ export const DashboardPage: React.FC = () => {
               <div
                 key={s.id}
                 className={`${styles.sessionItem} ${isActive ? styles.sessionItemActive : ''}`}
-                onClick={() => !isEditing && setActiveSessionId(s.id)}
+                onClick={() => {
+                  if (!isEditing) {
+                    setActiveSessionId(s.id);
+                    setShowSessions(false);
+                  }
+                }}
               >
                 {isEditing ? (
                   <form 
@@ -194,11 +208,23 @@ export const DashboardPage: React.FC = () => {
       {/* Main Workspace Frame */}
       <div className={styles.chatContentPanel}>
         {/* Workspace controls header */}
-        {messages.length > 0 && (
-          <header className={styles.chatContentHeader}>
+        <header className={styles.chatContentHeader}>
+          <div className={styles.chatHeaderLeft}>
+            <button 
+              className={styles.toggleSessionsBtn}
+              onClick={() => setShowSessions(v => !v)}
+              title="Toggle Sessions List"
+            >
+              <MessageSquare size={16} />
+              <span>Chats</span>
+            </button>
             <span className={styles.chatHeaderTitle}>
-              Active Conversation: {sessions.find(s => s.id === activeSessionId)?.title}
+              {messages.length > 0 
+                ? `Active: ${sessions.find(s => s.id === activeSessionId)?.title || ''}`
+                : 'New Conversation'}
             </span>
+          </div>
+          {messages.length > 0 && (
             <div className={styles.chatHeaderControls}>
               <button 
                 className={styles.controlHeaderBtn} 
@@ -206,7 +232,7 @@ export const DashboardPage: React.FC = () => {
                 title="Export Active Chat to Markdown"
               >
                 <Download size={14} />
-                <span>Export Session</span>
+                <span className={styles.btnText}>Export Session</span>
               </button>
               <button 
                 className={styles.controlHeaderBtn} 
@@ -214,11 +240,11 @@ export const DashboardPage: React.FC = () => {
                 title="Clear Current Conversation Thread"
               >
                 <RotateCcw size={14} />
-                <span>Reset Chat</span>
+                <span className={styles.btnText}>Reset Chat</span>
               </button>
             </div>
-          </header>
-        )}
+          )}
+        </header>
 
         <div className={styles.chatWorkspace}>
           {messages.length === 0 ? (

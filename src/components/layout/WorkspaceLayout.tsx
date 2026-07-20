@@ -3,7 +3,7 @@ import { Outlet, NavLink, Link } from 'react-router-dom';
 import {
   BookOpen, MessageSquare, Database, UploadCloud,
   Settings, User, Activity, RefreshCw, PanelLeftClose, PanelLeft,
-  Zap, BrainCircuit,
+  Zap, BrainCircuit, Menu,
 } from 'lucide-react';
 import { useSettings } from '../../state/SettingsContext';
 import { useServerHealth } from '../../hooks/useServerHealth';
@@ -24,6 +24,7 @@ export const WorkspaceLayout: React.FC = () => {
   const { activeChunk } = useAssistant();
   const serverStatus = useServerHealth();
   const [collapsed, setCollapsed] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   const statusLabel =
     serverStatus === 'online'   ? 'Server Connected' :
@@ -35,10 +36,18 @@ export const WorkspaceLayout: React.FC = () => {
 
   return (
     <div className={styles.shell}>
+      {/* Backdrop for mobile drawer */}
+      {mobileSidebarOpen && (
+        <div 
+          className={styles.backdrop} 
+          onClick={() => setMobileSidebarOpen(false)} 
+        />
+      )}
+
       {/* ── Sidebar ── */}
-      <aside className={`${styles.sidebar} ${collapsed ? styles.collapsed : ''}`}>
+      <aside className={`${styles.sidebar} ${collapsed ? styles.collapsed : ''} ${mobileSidebarOpen ? styles.mobileOpen : ''}`}>
         {/* Logo */}
-        <Link to="/" className={styles.brand}>
+        <Link to="/" className={styles.brand} onClick={() => setMobileSidebarOpen(false)}>
           <div className={styles.logoMark}><BookOpen size={18} /></div>
           {!collapsed && <span className={styles.brandLabel}>Paper Explorer</span>}
         </Link>
@@ -61,6 +70,7 @@ export const WorkspaceLayout: React.FC = () => {
                 `${styles.navItem} ${isActive ? styles.navActive : ''}`
               }
               title={collapsed ? label : undefined}
+              onClick={() => setMobileSidebarOpen(false)}
             >
               <Icon size={17} className={styles.navIcon} />
               {!collapsed && <span>{label}</span>}
@@ -93,7 +103,16 @@ export const WorkspaceLayout: React.FC = () => {
       <div className={styles.mainPanel}>
         {/* Top Header */}
         <header className={styles.topHeader}>
-          <span className={styles.headerRoute}>Research Paper Assistant</span>
+          <div className={styles.headerLeft}>
+            <button 
+              className={styles.hamburgerBtn}
+              onClick={() => setMobileSidebarOpen(true)}
+              title="Open Menu"
+            >
+              <Menu size={20} />
+            </button>
+            <span className={styles.headerRoute}>Research Paper Assistant</span>
+          </div>
           <div className={styles.headerRight}>
             <span className={`${styles.statusPill} ${statusClass}`}>
               <StatusIcon size={12} className={serverStatus === 'checking' ? styles.spin : ''} />
@@ -117,5 +136,6 @@ export const WorkspaceLayout: React.FC = () => {
     </div>
   );
 };
+
 
 export default WorkspaceLayout;

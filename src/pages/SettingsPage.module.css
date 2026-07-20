@@ -189,3 +189,45 @@
   border-color: rgba(99,102,241,0.4);
   box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
 }
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .page {
+    padding: 20px 16px;
+  }
+
+  .section {
+    padding: 20px 16px;
+  }
+
+  .settingRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .settingMeta {
+    width: 100%;
+  }
+
+  .sliderGroup {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .slider {
+    width: 100%;
+    max-width: 200px;
+  }
+
+  .modelToggle {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .toggleBtn {
+    flex: 1;
+    text-align: center;
+  }
+}
+

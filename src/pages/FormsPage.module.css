@@ -263,3 +263,29 @@
   align-items: center;
   gap: 6px;
 }
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .page {
+    padding: 20px 16px;
+  }
+
+  .section {
+    padding: 20px 16px;
+  }
+
+  .dropZone {
+    padding: 32px 16px;
+  }
+
+  .ingestActions {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+

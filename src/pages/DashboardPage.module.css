@@ -392,3 +392,119 @@
 }
 
 .guideCard li:last-child { margin-bottom: 0; }
+
+/* Responsive Adjustments & New Mobile Selectors */
+.chatHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.toggleSessionsBtn {
+  display: none; /* Hidden on desktop */
+  align-items: center;
+  gap: 8px;
+  background: rgba(99, 102, 241, 0.1);
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  border-radius: 8px;
+  color: #818cf8;
+  padding: 6px 12px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.toggleSessionsBtn:hover {
+  background: rgba(99, 102, 241, 0.2);
+  color: white;
+  border-color: rgba(99, 102, 241, 0.4);
+}
+
+.btnText {
+  display: inline;
+}
+
+.subSidebarBackdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 175;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (max-width: 768px) {
+  .toggleSessionsBtn {
+    display: flex; /* Visible on mobile */
+  }
+
+  .subSidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: -265px; /* Hidden offscreen on mobile */
+    z-index: 180;
+    height: 100vh;
+    box-shadow: 5px 0 25px rgba(0, 0, 0, 0.5);
+    background: var(--bg-secondary);
+    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 260px !important;
+  }
+
+  .subSidebarOpen {
+    left: 0 !important;
+  }
+
+  .btnText {
+    display: none; /* Hide button text to fit header buttons */
+  }
+
+  .controlHeaderBtn {
+    padding: 6px;
+    border-radius: 50%;
+  }
+
+  .chatContentHeader {
+    padding: 0 16px;
+  }
+
+  .chatWorkspace {
+    padding: 16px;
+  }
+
+  .footerWrapper {
+    padding: 10px 16px 20px;
+  }
+
+  /* Stack suggested questions vertically on mobile */
+  .suggestCard {
+    flex: 1 1 100%;
+    min-width: 100%;
+  }
+
+  .suggestionsContainer {
+    margin-left: 12px;
+  }
+
+  .loadingContainer {
+    margin-left: 12px;
+  }
+
+  .welcomePanel {
+    margin-top: 4vh;
+  }
+
+  .welcomePanel h2 {
+    font-size: 1.5rem;
+  }
+}
+
