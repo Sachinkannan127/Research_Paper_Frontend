@@ -83,6 +83,7 @@ export const useChatService = () => {
                    s.name === 'similarity_search' ? 'vector similarity search' :
                    s.name === 'top_k' ? 'top-k' : s.name,
             status: s.status,
+            latency_ms: s.latency_ms,
           }))
         : initialSteps.map(step => ({ ...step, status: 'done' as const }));
 
@@ -91,6 +92,7 @@ export const useChatService = () => {
         retryAttempts: data.retry_attempts,
         retrievedChunks: data.retrieved_chunks,
         pipelineSteps: responseSteps,
+        latencyMetrics: data.latency_metrics,
       });
     } catch (err: any) {
       console.error('Error fetching chat response:', err);
@@ -166,6 +168,7 @@ export const useChatService = () => {
       let detectedAttempts = 1;
       let isMetadataPhase = true;
       let retrievedChunksList: any[] = [];
+      let latencyMetricsVal: any = undefined;
 
       while (!done) {
         const { value, done: doneReading } = await reader.read();
@@ -188,8 +191,9 @@ export const useChatService = () => {
               if (parts.length >= 3) {
                 const stepName = parts[1];
                 const stepStatus = parts[2].trim() as 'active' | 'done' | 'cached' | 'failed';
+                const latencyMs = parts[3] ? parseFloat(parts[3]) : undefined;
                 currentSteps = currentSteps.map(step => 
-                  step.name === stepName ? { ...step, status: stepStatus } : step
+                  step.name === stepName ? { ...step, status: stepStatus, latency_ms: latencyMs } : step
                 );
                 
                 updateMessageContent(assistantMsgId, '', {
@@ -203,6 +207,13 @@ export const useChatService = () => {
                 retrievedChunksList = JSON.parse(jsonStr);
               } catch (e) {
                 console.error("Failed to parse retrieved chunks:", e);
+              }
+            } else if (line.startsWith('__LATENCY_METRICS__:')) {
+              const jsonStr = line.substring('__LATENCY_METRICS__:'.length);
+              try {
+                latencyMetricsVal = JSON.parse(jsonStr);
+              } catch (e) {
+                console.error("Failed to parse latency metrics:", e);
               }
             } else if (line.startsWith('Model:')) {
               detectedModel = line.substring(6).trim();
@@ -245,6 +256,7 @@ export const useChatService = () => {
               retryAttempts: detectedAttempts,
               pipelineSteps: [...currentSteps],
               retrievedChunks: retrievedChunksList.length > 0 ? retrievedChunksList : undefined,
+              latencyMetrics: latencyMetricsVal,
             });
           }
         }
@@ -261,6 +273,7 @@ export const useChatService = () => {
             : step
         ),
         retrievedChunks: retrievedChunksList.length > 0 ? retrievedChunksList : undefined,
+        latencyMetrics: latencyMetricsVal,
       });
 
     } catch (err: any) {
@@ -283,8 +296,93 @@ export const useChatService = () => {
     }
   };
 
+  const sendVoiceQuestion = async (audioBlob: Blob) => {
+    setIsLoading(true);
+    setError(null);
+
+    // 1. Add User Message placeholder
+    const userMsgId = addMessage({
+      role: 'user',
+      content: '🎙️ Sending voice query...',
+    });
+
+    const initialSteps = getInitialSteps();
+
+    // 2. Prepare Assistant Message Placeholder
+    const assistantMsgId = addMessage({
+      role: 'assistant',
+      content: '',
+      isStreaming: false,
+      pipelineSteps: initialSteps,
+    });
+
+    try {
+      const formData = new FormData();
+      formData.append('file', audioBlob, 'recording.webm');
+
+      const response = await fetch(`${apiBaseUrl}/voice/process`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error(`Server returned HTTP ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      // Update User Message content with transcribed text
+      updateMessageContent(userMsgId, data.transcription || '🎙️ (Audio Query)');
+
+      const responseSteps = data.pipeline_steps
+        ? data.pipeline_steps.map((s: any) => ({
+            name: s.name,
+            label: s.name === 'text_extract' ? 'text extract' :
+                   s.name === 'chunking' ? 'chunking' :
+                   s.name === 'embedding' ? 'Embedding' :
+                   s.name === 'vector_store' ? 'vector store' :
+                   s.name === 'query_embedding' ? 'query Embedding' :
+                   s.name === 'similarity_search' ? 'vector similarity search' :
+                   s.name === 'top_k' ? 'top-k' : s.name,
+            status: s.status,
+            latency_ms: s.latency_ms,
+          }))
+        : initialSteps.map(step => ({ ...step, status: 'done' as const }));
+
+      // Update Assistant Message with answer and base64 audio
+      updateMessageContent(assistantMsgId, data.answer, {
+        audioBase64: data.audio_base64,
+        modelName: data.model_name || 'Gemini (Voice Mode)',
+        retryAttempts: data.retry_attempts || 1,
+        retrievedChunks: data.retrieved_chunks,
+        pipelineSteps: responseSteps,
+        latencyMetrics: data.latency_metrics,
+      });
+
+      return {
+        assistantMsgId,
+        audioBase64: data.audio_base64,
+        transcription: data.transcription,
+        answer: data.answer,
+      };
+    } catch (err: any) {
+      console.error('Error fetching voice response:', err);
+      setError(err.message || 'Failed to process voice command.');
+      
+      updateMessageContent(userMsgId, '🎙️ (Voice Recording)');
+      updateMessageContent(assistantMsgId, 'Error: Failed to process voice query. Please verify the backend is running.', {
+        isStreaming: false,
+        pipelineSteps: initialSteps.map(step => ({ ...step, status: 'failed' as const })),
+      });
+      return null;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return {
     sendQuestionSync,
     sendQuestionStream,
+    sendVoiceQuestion,
   };
 };

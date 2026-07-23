@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Message, useAssistant, PipelineStep } from '../../state/AssistantContext';
 import { ModelBadge } from './ModelBadge';
-import { FileText, Check, Loader2, Database, AlertCircle, ChevronDown, ChevronUp, Cpu, Network } from 'lucide-react';
+import { FileText, Check, Loader2, Database, AlertCircle, ChevronDown, ChevronUp, Cpu, Network, Volume2, VolumeX, Clock } from 'lucide-react';
 import styles from './ChatBubble.module.css';
 
 interface ChatBubbleProps {
   message: Message;
+  playingMessageId?: string | null;
+  isPlaying?: boolean;
+  onPlayAudio?: (id: string, base64: string) => void;
 }
 
 const PipelineStepper: React.FC<{ steps: PipelineStep[]; message: Message }> = ({ steps, message }) => {
@@ -90,6 +93,9 @@ const PipelineStepper: React.FC<{ steps: PipelineStep[]; message: Message }> = (
                   </div>
                   <span className={styles.stepNameLabel}>{step.label}</span>
                   {step.status === 'cached' && <span className={styles.cachedBadge}>cached</span>}
+                  {step.latency_ms !== undefined && step.latency_ms > 0 && (
+                    <span className={styles.stepLatency}>{step.latency_ms.toFixed(0)}ms</span>
+                  )}
                 </div>
               ))}
             </div>
@@ -109,6 +115,9 @@ const PipelineStepper: React.FC<{ steps: PipelineStep[]; message: Message }> = (
                     {renderStepIcon(step.status)}
                   </div>
                   <span className={styles.stepNameLabel}>{step.label}</span>
+                  {step.latency_ms !== undefined && step.latency_ms > 0 && (
+                    <span className={styles.stepLatency}>{step.latency_ms.toFixed(0)}ms</span>
+                  )}
                 </div>
               ))}
             </div>
@@ -119,7 +128,12 @@ const PipelineStepper: React.FC<{ steps: PipelineStep[]; message: Message }> = (
   );
 };
 
-export const ChatBubble: React.FC<ChatBubbleProps> = ({ message }) => {
+export const ChatBubble: React.FC<ChatBubbleProps> = ({ 
+  message, 
+  playingMessageId, 
+  isPlaying, 
+  onPlayAudio 
+}) => {
   const { setActiveChunk, activeChunk } = useAssistant();
   const isUser = message.role === 'user';
 
@@ -214,10 +228,25 @@ export const ChatBubble: React.FC<ChatBubbleProps> = ({ message }) => {
 
       <div className={styles.bubbleContent}>
         {!isUser && (
-          <ModelBadge 
-            modelName={message.modelName} 
-            attempts={message.retryAttempts} 
-          />
+          <div className={styles.metaRow}>
+            <ModelBadge 
+              modelName={message.modelName} 
+              attempts={message.retryAttempts} 
+            />
+            {message.latencyMetrics && (
+              <span 
+                className={styles.latencyBadge} 
+                title={`RAG processing timer: ${message.latencyMetrics.rag_latency_ms.toFixed(0)}ms, LLM answer generation: ${message.latencyMetrics.llm_latency_ms.toFixed(0)}ms`}
+              >
+                <Clock size={11} />
+                <span>
+                  {message.latencyMetrics.total_latency_ms > 1000 
+                    ? `${(message.latencyMetrics.total_latency_ms / 1000).toFixed(2)}s` 
+                    : `${message.latencyMetrics.total_latency_ms.toFixed(0)}ms`}
+                </span>
+              </span>
+            )}
+          </div>
         )}
 
         <div className={styles.body}>
@@ -229,9 +258,53 @@ export const ChatBubble: React.FC<ChatBubbleProps> = ({ message }) => {
                 <PipelineStepper steps={message.pipelineSteps} message={message} />
               )}
               {renderMarkdown(message.content)}
+              
+              {message.audioBase64 && onPlayAudio && (
+                <button
+                  className={`${styles.playAudioBtn} ${playingMessageId === message.id && isPlaying ? styles.playAudioBtnActive : ''}`}
+                  onClick={() => onPlayAudio(message.id, message.audioBase64!)}
+                  title={playingMessageId === message.id && isPlaying ? "Silence voice response" : "Read response aloud"}
+                  type="button"
+                >
+                  {playingMessageId === message.id && isPlaying ? (
+                    <VolumeX size={13} />
+                  ) : (
+                    <Volume2 size={13} />
+                  )}
+                  <span>{playingMessageId === message.id && isPlaying ? "Pause response" : "Listen Response"}</span>
+                </button>
+              )}
             </>
           )}
         </div>
+
+        {/* Performance Statistics */}
+        {!isUser && message.latencyMetrics && (
+          <div className={styles.performanceStatsCard}>
+            <div className={styles.perfHeader}>
+              <Cpu size={13} />
+              <span>Pipeline latency breakdown</span>
+            </div>
+            <div className={styles.perfGrid}>
+              <div className={styles.perfItem}>
+                <span className={styles.perfLabel}>RAG Retrieval:</span>
+                <span className={styles.perfVal}>{message.latencyMetrics.rag_latency_ms.toFixed(0)}ms</span>
+              </div>
+              <div className={styles.perfItem}>
+                <span className={styles.perfLabel}>LLM Inference:</span>
+                <span className={styles.perfVal}>{message.latencyMetrics.llm_latency_ms.toFixed(0)}ms</span>
+              </div>
+              <div className={styles.perfItem}>
+                <span className={styles.perfLabel}>Total delay:</span>
+                <span className={styles.perfValHighlight}>
+                  {message.latencyMetrics.total_latency_ms > 1000 
+                    ? `${(message.latencyMetrics.total_latency_ms / 1000).toFixed(2)}s` 
+                    : `${message.latencyMetrics.total_latency_ms.toFixed(0)}ms`}
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* References Panel included at bottom of Bubble */}
         {!isUser && message.retrievedChunks && message.retrievedChunks.length > 0 && (
@@ -256,8 +329,15 @@ export const ChatBubble: React.FC<ChatBubbleProps> = ({ message }) => {
                       <span className={styles.refName}>{filename}</span>
                       <span className={styles.refPage}>Page {chunk.page || 'N/A'}</span>
                     </div>
-                    <div className={styles.refScore}>
-                      Dist: {chunk.score.toFixed(3)}
+                    <div 
+                      className={styles.refScore} 
+                      title={`Metric check: ${chunk.metric || 'L2 Distance'}`}
+                    >
+                      {chunk.similarity_percentage !== undefined ? (
+                        <span>Match: {chunk.similarity_percentage.toFixed(1)}%</span>
+                      ) : (
+                        <span>Dist: {chunk.score.toFixed(3)}</span>
+                      )}
                     </div>
                   </div>
                 );

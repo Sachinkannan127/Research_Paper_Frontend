@@ -1,12 +1,11 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { useAssistant } from '../state/AssistantContext';
 import { ChatBubble } from '../components/chat/ChatBubble';
 import { ChatInput } from '../components/chat/ChatInput';
 import { Loader } from '../components/common/Loader';
-import { 
-  BookOpen, Plus, Trash2, Edit3, Check, X, Download, RotateCcw, 
-  MessageSquare, Sparkles 
-} from 'lucide-react';
+import { useAudioPlayback } from '../hooks/useAudioPlayback';
+import { useSettings } from '../state/SettingsContext';
+import { BookOpen, Download, RotateCcw, Sparkles } from 'lucide-react';
 import styles from './DashboardPage.module.css';
 
 export const DashboardPage: React.FC = () => {
@@ -15,43 +14,37 @@ export const DashboardPage: React.FC = () => {
     activeSessionId, 
     messages, 
     isLoading, 
-    createSession, 
-    deleteSession, 
-    renameSession, 
-    setActiveSessionId,
     clearChat 
   } = useAssistant();
   
-  const chatEndRef = useRef<HTMLDivElement>(null);
-  
-  // Renaming State
-  const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
-  const [editingTitle, setEditingTitle] = useState('');
-  const [showSessions, setShowSessions] = useState(false);
+  const { voiceAutoplay } = useSettings();
+  const { isPlaying, playingMessageId, playMessageAudio } = useAudioPlayback();
 
+  const chatEndRef = useRef<HTMLDivElement>(null);
+  const lastPlayedMessageIdRef = useRef<string | null>(null);
+
+  // Auto-play TTS when a new voice assistant message is received
+  useEffect(() => {
+    if (messages.length === 0) return;
+    const lastMsg = messages[messages.length - 1];
+
+    if (
+      lastMsg.role === 'assistant' &&
+      lastMsg.audioBase64 &&
+      voiceAutoplay &&
+      lastPlayedMessageIdRef.current !== lastMsg.id
+    ) {
+      lastPlayedMessageIdRef.current = lastMsg.id;
+      playMessageAudio(lastMsg.id, lastMsg.audioBase64);
+    }
+  }, [messages, voiceAutoplay, playMessageAudio]);
+  
   // Auto-scroll to bottom of thread
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isLoading]);
 
-  const handleStartRename = (id: string, currentTitle: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setEditingSessionId(id);
-    setEditingTitle(currentTitle);
-  };
 
-  const handleSaveRename = (id: string, e?: React.FormEvent) => {
-    e?.preventDefault();
-    if (editingTitle.trim()) {
-      renameSession(id, editingTitle.trim());
-    }
-    setEditingSessionId(null);
-  };
-
-  const handleCancelRename = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setEditingSessionId(null);
-  };
 
   // Export Chat to Markdown
   const exportToMarkdown = () => {
@@ -117,107 +110,11 @@ export const DashboardPage: React.FC = () => {
 
   return (
     <div className={styles.container}>
-      {/* Mobile subSidebar backdrop overlay */}
-      {showSessions && (
-        <div 
-          className={styles.subSidebarBackdrop} 
-          onClick={() => setShowSessions(false)} 
-        />
-      )}
-
-      {/* Sub Sidebar: Chat sessions list */}
-      <aside className={`${styles.subSidebar} ${showSessions ? styles.subSidebarOpen : ''}`}>
-        <div className={styles.subSidebarHeader}>
-          <button className={styles.newChatBtn} onClick={() => { createSession(); setShowSessions(false); }}>
-            <Plus size={16} />
-            <span>New Chat</span>
-          </button>
-        </div>
-        
-        <div className={styles.sessionList}>
-          {sessions.map((s) => {
-            const isActive = s.id === activeSessionId;
-            const isEditing = s.id === editingSessionId;
-
-            return (
-              <div
-                key={s.id}
-                className={`${styles.sessionItem} ${isActive ? styles.sessionItemActive : ''}`}
-                onClick={() => {
-                  if (!isEditing) {
-                    setActiveSessionId(s.id);
-                    setShowSessions(false);
-                  }
-                }}
-              >
-                {isEditing ? (
-                  <form 
-                    className={styles.renameForm} 
-                    onSubmit={(e) => handleSaveRename(s.id, e)}
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <input
-                      type="text"
-                      className={styles.renameInput}
-                      value={editingTitle}
-                      onChange={(e) => setEditingTitle(e.target.value)}
-                      autoFocus
-                    />
-                    <button type="submit" className={styles.iconVerifyBtn} title="Save">
-                      <Check size={13} />
-                    </button>
-                    <button type="button" className={styles.iconVerifyBtn} onClick={handleCancelRename} title="Cancel">
-                      <X size={13} />
-                    </button>
-                  </form>
-                ) : (
-                  <>
-                    <div className={styles.sessionIconLabel}>
-                      <MessageSquare size={14} className={styles.bubbleIcon} />
-                      <span className={styles.sessionTitle}>{s.title}</span>
-                    </div>
-                    {isActive && (
-                      <div className={styles.sessionActions}>
-                        <button
-                          className={styles.sessionActionBtn}
-                          onClick={(e) => handleStartRename(s.id, s.title, e)}
-                          title="Rename Session"
-                        >
-                          <Edit3 size={12} />
-                        </button>
-                        <button
-                          className={styles.sessionActionBtn}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            deleteSession(s.id);
-                          }}
-                          title="Delete Session"
-                        >
-                          <Trash2 size={12} />
-                        </button>
-                      </div>
-                    )}
-                  </>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </aside>
-
       {/* Main Workspace Frame */}
       <div className={styles.chatContentPanel}>
         {/* Workspace controls header */}
         <header className={styles.chatContentHeader}>
           <div className={styles.chatHeaderLeft}>
-            <button 
-              className={styles.toggleSessionsBtn}
-              onClick={() => setShowSessions(v => !v)}
-              title="Toggle Sessions List"
-            >
-              <MessageSquare size={16} />
-              <span>Chats</span>
-            </button>
             <span className={styles.chatHeaderTitle}>
               {messages.length > 0 
                 ? `Active: ${sessions.find(s => s.id === activeSessionId)?.title || ''}`
@@ -270,7 +167,13 @@ export const DashboardPage: React.FC = () => {
           ) : (
             <div className={styles.messagesList}>
               {messages.map((msg) => (
-                <ChatBubble key={msg.id} message={msg} />
+                <ChatBubble 
+                  key={msg.id} 
+                  message={msg}
+                  isPlaying={isPlaying}
+                  playingMessageId={playingMessageId}
+                  onPlayAudio={playMessageAudio}
+                />
               ))}
               
               {isLoading && !messages.some(msg => msg.role === 'assistant' && (msg.isStreaming || msg.pipelineSteps)) && (

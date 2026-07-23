@@ -2,20 +2,33 @@ import React, { useState, KeyboardEvent, useRef, useEffect } from 'react';
 import { useSettings } from '../../state/SettingsContext';
 import { useAssistant } from '../../state/AssistantContext';
 import { useChatService } from '../../hooks/useChatService';
-import { Send, Trash2, Zap, BrainCircuit, Sliders } from 'lucide-react';
+import { Send, Trash2, Zap, BrainCircuit, AudioLines } from 'lucide-react';
+import { useAudioRecorder } from '../../hooks/useAudioRecorder';
 import styles from './ChatInput.module.css';
 
 export const ChatInput: React.FC = () => {
   const [question, setQuestion] = useState('');
-  const [useStream, setUseStream] = useState(() => {
-    const saved = localStorage.getItem('assistant_use_stream');
-    return saved !== 'false'; // Default to streaming
-  });
   
   const { model, setModel } = useSettings();
   const { isLoading, clearChat } = useAssistant();
-  const { sendQuestionSync, sendQuestionStream } = useChatService();
+  const { sendQuestionStream, sendVoiceQuestion } = useChatService();
+  const { isRecording, startRecording, stopRecording, cancelRecording } = useAudioRecorder();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const handleMicClick = async () => {
+    if (isRecording) {
+      const audioBlob = await stopRecording();
+      if (audioBlob) {
+        await sendVoiceQuestion(audioBlob);
+      }
+    } else {
+      await startRecording();
+    }
+  };
+
+  const handleCancelRecord = () => {
+    cancelRecording();
+  };
 
   // Auto-resize textarea when text is typed
   useEffect(() => {
@@ -31,30 +44,21 @@ export const ChatInput: React.FC = () => {
     const handleSuggestedAsk = (e: Event) => {
       const q = (e as CustomEvent).detail;
       if (q && !isLoading) {
-        if (useStream) {
-          sendQuestionStream(q);
-        } else {
-          sendQuestionSync(q);
-        }
+        sendQuestionStream(q);
       }
     };
     window.addEventListener('ask-suggested-question', handleSuggestedAsk);
     return () => {
       window.removeEventListener('ask-suggested-question', handleSuggestedAsk);
     };
-  }, [isLoading, useStream, sendQuestionSync, sendQuestionStream]);
+  }, [isLoading, sendQuestionStream]);
 
   const handleSubmit = () => {
     if (!question.trim() || isLoading) return;
 
     const trimmedQuestion = question.trim();
     setQuestion('');
-
-    if (useStream) {
-      sendQuestionStream(trimmedQuestion);
-    } else {
-      sendQuestionSync(trimmedQuestion);
-    }
+    sendQuestionStream(trimmedQuestion);
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -62,14 +66,6 @@ export const ChatInput: React.FC = () => {
       e.preventDefault();
       handleSubmit();
     }
-  };
-
-  const toggleStreamMode = () => {
-    setUseStream((prev) => {
-      const next = !prev;
-      localStorage.setItem('assistant_use_stream', String(next));
-      return next;
-    });
   };
 
   return (
@@ -99,16 +95,6 @@ export const ChatInput: React.FC = () => {
 
         <div className={styles.utilityActions}>
           <button
-            className={`${styles.optionBtn} ${useStream ? styles.optionBtnActiveStream : ''}`}
-            onClick={toggleStreamMode}
-            title="Toggle Streaming response chunk-by-chunk"
-            disabled={isLoading}
-          >
-            <Sliders size={14} />
-            <span>{useStream ? 'Streaming: On' : 'Streaming: Off'}</span>
-          </button>
-
-          <button
             className={styles.trashBtn}
             onClick={clearChat}
             title="Reset active chat logs"
@@ -121,24 +107,55 @@ export const ChatInput: React.FC = () => {
 
       {/* Input textbox area */}
       <div className={styles.inputBoxWrapper}>
-        <textarea
-          ref={textareaRef}
-          className={styles.textarea}
-          placeholder="Ask a question about the research paper..."
-          value={question}
-          onChange={(e) => setQuestion(e.target.value)}
-          onKeyDown={handleKeyDown}
-          rows={1}
-          disabled={isLoading}
-        />
-        <button
-          className={`${styles.sendBtn} ${question.trim() && !isLoading ? styles.sendBtnActive : ''}`}
-          onClick={handleSubmit}
-          disabled={!question.trim() || isLoading}
-          title="Send query"
-        >
-          <Send size={16} />
-        </button>
+        {!isRecording && (
+          <button
+            className={styles.micBtn}
+            onClick={handleMicClick}
+            disabled={isLoading}
+            title="Ask via Voice"
+            type="button"
+          >
+            <AudioLines size={16} />
+          </button>
+        )}
+
+        {isRecording ? (
+          <div className={styles.recordingState} onClick={handleMicClick} title="Stop and submit query">
+            <div>
+              <span className={styles.pulsingWave} />
+              <span>Recording... Click box to stop &amp; send</span>
+            </div>
+            <button
+              className={styles.cancelBtn}
+              onClick={(e) => { e.stopPropagation(); handleCancelRecord(); }}
+              type="button"
+            >
+              Cancel
+            </button>
+          </div>
+        ) : (
+          <textarea
+            ref={textareaRef}
+            className={styles.textarea}
+            placeholder="Ask a question about the research paper..."
+            value={question}
+            onChange={(e) => setQuestion(e.target.value)}
+            onKeyDown={handleKeyDown}
+            rows={1}
+            disabled={isLoading}
+          />
+        )}
+
+        {!isRecording && (
+          <button
+            className={`${styles.sendBtn} ${question.trim() && !isLoading ? styles.sendBtnActive : ''}`}
+            onClick={handleSubmit}
+            disabled={!question.trim() || isLoading}
+            title="Send query"
+          >
+            <Send size={16} />
+          </button>
+        )}
       </div>
     </div>
   );

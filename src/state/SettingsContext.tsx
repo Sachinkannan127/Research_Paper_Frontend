@@ -14,6 +14,10 @@ interface SettingsContextType {
   clearLocalData: () => void;
   activePdfName: string;
   refreshConfig: () => Promise<void>;
+  voiceAutoplay: boolean;
+  setVoiceAutoplay: (value: boolean) => void;
+  theme: 'dark' | 'light';
+  toggleTheme: () => void;
 }
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
@@ -27,6 +31,16 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [useStream, setUseStreamBase] = useState<boolean>(() => {
     const saved = localStorage.getItem('assistant_use_stream');
     return saved !== 'false';
+  });
+
+  const [voiceAutoplay, setVoiceAutoplayBase] = useState<boolean>(() => {
+    const saved = localStorage.getItem('assistant_voice_autoplay');
+    return saved !== 'false';
+  });
+
+  const [theme, setThemeBase] = useState<'dark' | 'light'>(() => {
+    const saved = localStorage.getItem('assistant_theme');
+    return saved === 'light' ? 'light' : 'dark';
   });
 
   const [activePdfName, setActivePdfName] = useState<string>('Research_paper.pdf');
@@ -53,6 +67,10 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     refreshConfig();
   }, [apiBaseUrl]);
 
+  React.useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+  }, [theme]);
+
   const toggleModel = () => {
     setModelBase((prev) => {
       const next = prev === 'fast' ? 'smart' : 'fast';
@@ -75,11 +93,28 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setUseStream(!useStream);
   };
 
+  const setVoiceAutoplay = (value: boolean) => {
+    localStorage.setItem('assistant_voice_autoplay', String(value));
+    setVoiceAutoplayBase(value);
+  };
+
+  const toggleTheme = () => {
+    setThemeBase((prev) => {
+      const next = prev === 'dark' ? 'light' : 'dark';
+      localStorage.setItem('assistant_theme', next);
+      return next;
+    });
+  };
+
   const resetPreferences = () => {
     localStorage.removeItem('assistant_model');
     localStorage.removeItem('assistant_use_stream');
+    localStorage.removeItem('assistant_voice_autoplay');
+    localStorage.removeItem('assistant_theme');
     setModelBase('fast');
     setUseStreamBase(true);
+    setVoiceAutoplayBase(true);
+    setThemeBase('dark');
   };
 
   const clearLocalData = () => {
@@ -101,6 +136,10 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         clearLocalData,
         activePdfName,
         refreshConfig,
+        voiceAutoplay,
+        setVoiceAutoplay,
+        theme,
+        toggleTheme,
       }}
     >
       {children}

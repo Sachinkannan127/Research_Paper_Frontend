@@ -4,7 +4,7 @@ import { useSettings } from '../state/SettingsContext';
 import styles from './SettingsPage.module.css';
 
 export const SettingsPage: React.FC = () => {
-  const { model, setModel, useStream, setUseStream } = useSettings();
+  const { model, setModel, useStream, setUseStream, voiceAutoplay, setVoiceAutoplay } = useSettings();
   const [topK, setTopK] = useState(3);
   const [autoIngest, setAutoIngest] = useState(true);
   const [telemetry, setTelemetry] = useState(true);
@@ -113,6 +113,7 @@ export const SettingsPage: React.FC = () => {
 
         {[
           { label: 'Auto-Ingest on Drop',  desc: 'Automatically ingest dropped PDFs into vector store.', val: autoIngest, set: setAutoIngest },
+          { label: 'Voice Response Autoplay', desc: 'Automatically read aloud synthesized responses.', val: voiceAutoplay, set: setVoiceAutoplay },
           { label: 'Usage Telemetry',      desc: 'Log anonymised query metrics for performance insight.', val: telemetry,   set: setTelemetry },
         ].map(({ label, desc, val, set }) => (
           <div key={label} className={styles.settingRow}>

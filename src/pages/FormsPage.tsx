@@ -19,6 +19,7 @@ export const FormsPage: React.FC = () => {
   const [uploadedFile, setUploadedFile] = useState<string | null>(null);
   const [systemPrompt, setSystemPrompt] = useState('You are an expert research assistant. Answer questions strictly based on the provided context from academic papers.');
   const [welcomeMsg, setWelcomeMsg] = useState('Ask me anything about the uploaded research paper!');
+  const [similarityMetric, setSimilarityMetric] = useState('cosine');
   const [saved, setSaved] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -43,6 +44,7 @@ export const FormsPage: React.FC = () => {
           const data = await res.json();
           if (data.system_prompt) setSystemPrompt(data.system_prompt);
           if (data.welcome_message) setWelcomeMsg(data.welcome_message);
+          if (data.similarity_metric) setSimilarityMetric(data.similarity_metric);
           if (data.active_pdf_name) setUploadedFile(data.active_pdf_name);
         }
       } catch (err) {
@@ -189,6 +191,7 @@ export const FormsPage: React.FC = () => {
         body: JSON.stringify({
           system_prompt: systemPrompt,
           welcome_message: welcomeMsg,
+          similarity_metric: similarityMetric,
         }),
       });
 
@@ -341,6 +344,19 @@ export const FormsPage: React.FC = () => {
             value={welcomeMsg}
             onChange={e => setWelcomeMsg(e.target.value)}
           />
+        </div>
+
+        <div className={styles.fieldGroup}>
+          <label className={styles.fieldLabel}>Similarity Check Metric</label>
+          <select
+            className={styles.select}
+            value={similarityMetric}
+            onChange={e => setSimilarityMetric(e.target.value)}
+          >
+            <option value="cosine">Cosine Similarity</option>
+            <option value="l2">Euclidean (L2) Distance</option>
+            <option value="ip">Dot Product (Inner Product)</option>
+          </select>
         </div>
 
         <div className={styles.formActions}>

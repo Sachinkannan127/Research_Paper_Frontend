@@ -5,12 +5,15 @@ export interface RetrievedChunk {
   page: number | null;
   source: string | null;
   score: number;
+  similarity_percentage?: number;
+  metric?: string;
 }
 
 export interface PipelineStep {
   name: string;
   label: string;
   status: 'pending' | 'active' | 'done' | 'cached' | 'failed';
+  latency_ms?: number;
 }
 
 export interface Message {
@@ -22,7 +25,13 @@ export interface Message {
   retrievedChunks?: RetrievedChunk[];
   isStreaming?: boolean;
   pipelineSteps?: PipelineStep[];
+  audioBase64?: string; // Cache base64 synthesized audio response
   timestamp: number;
+  latencyMetrics?: {
+    total_latency_ms: number;
+    rag_latency_ms: number;
+    llm_latency_ms: number;
+  };
 }
 
 export interface ChatSession {
