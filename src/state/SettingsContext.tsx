@@ -45,7 +45,6 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const [activePdfName, setActivePdfName] = useState<string>('Research_paper.pdf');
 
-  const hostname = window.location.hostname === 'localhost' ? '127.0.0.1' : window.location.hostname;
   const rawApiUrl = import.meta.env.VITE_API_BASE_URL || `https://research-paper-assistant-ylic.onrender.com`;
   const apiBaseUrl = rawApiUrl.replace('localhost', '127.0.0.1').replace(/\/$/, '');
 
