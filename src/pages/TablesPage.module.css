@@ -1,0 +1,216 @@
+.page {
+  padding: 40px 48px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: 20px;
+}
+
+.pageHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+.pageTitle {
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: white;
+  margin-bottom: 6px;
+}
+
+.pageSub {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+}
+
+.dbMeta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: var(--accent-teal);
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  padding: 6px 14px;
+  border-radius: 20px;
+}
+
+/* Filter Bar */
+.filterBar { display: flex; gap: 12px; }
+
+.searchWrapper {
+  position: relative;
+  flex: 1;
+  max-width: 360px;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+}
+
+.searchInput {
+  width: 100%;
+  padding: 10px 14px 10px 38px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  color: white;
+  font-size: 0.875rem;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+
+.searchInput::placeholder { color: var(--text-muted); }
+
+.searchInput:focus {
+  outline: none;
+  border-color: rgba(99,102,241,0.4);
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
+}
+
+/* Table */
+.tableWrapper {
+  flex: 1;
+  overflow: auto; /* Enable both horizontal and vertical scroll */
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  background: var(--bg-secondary);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table thead tr {
+  border-bottom: 1px solid var(--border-color);
+}
+
+.table th {
+  padding: 13px 18px;
+  text-align: left;
+  font-size: 0.76rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.row {
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  transition: background 0.15s;
+}
+
+.row:last-child { border-bottom: none; }
+
+.row:hover { background: rgba(255,255,255,0.02); }
+
+.table td {
+  padding: 14px 18px;
+  font-size: 0.85rem;
+  vertical-align: top;
+}
+
+.idBadge {
+  display: inline-block;
+  padding: 3px 10px;
+  background: rgba(99,102,241,0.1);
+  border: 1px solid rgba(99,102,241,0.2);
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-family: monospace;
+  color: #818cf8;
+}
+
+.sourceCell { color: var(--text-secondary); font-size: 0.82rem; }
+
+.pageCell {
+  color: var(--accent-teal);
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.snippetCell { max-width: 380px; min-width: 200px; }
+
+.snippetText {
+  color: var(--text-secondary);
+  line-height: 1.5;
+  font-size: 0.82rem;
+}
+
+.vecBadge {
+  display: inline-block;
+  padding: 3px 10px;
+  background: rgba(16,185,129,0.08);
+  border: 1px solid rgba(16,185,129,0.2);
+  border-radius: 6px;
+  font-size: 0.76rem;
+  font-family: monospace;
+  color: var(--accent-teal);
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 4px;
+}
+
+.paginationMeta { font-size: 0.8rem; color: var(--text-muted); }
+
+.paginationBtns { display: flex; gap: 8px; }
+
+.pageBtn {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.pageBtn:hover:not(:disabled) {
+  background: rgba(99,102,241,0.1);
+  border-color: rgba(99,102,241,0.3);
+  color: white;
+}
+
+.pageBtn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .page {
+    padding: 20px 16px;
+    gap: 16px;
+  }
+
+  .pageHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .searchWrapper {
+    max-width: 100%;
+  }
+
+  .pagination {
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    text-align: center;
+  }
+}
+

@@ -1,0 +1,102 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+:root {
+  --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  --font-mono: 'Space Grotesk', 'Space Mono', Courier, monospace;
+
+  /* Theme color scheme: Deep space dark theme */
+  --bg-primary: #08090c;
+  --bg-secondary: #0f111a;
+  --bg-tertiary: #161925;
+  --border-color: rgba(255, 255, 255, 0.05);
+  --border-glow: rgba(99, 102, 241, 0.15);
+
+  --accent-primary: #6366f1;
+  --accent-blue: #3b82f6;
+  --accent-purple: #8b5cf6;
+  --accent-teal: #10b981;
+  --accent-rose: #f43f5e;
+
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  
+  --header-height: 70px;
+
+  /* Glass and bubble styles */
+  --bg-header-rgba: rgba(15, 17, 26, 0.6);
+  --bg-user-bubble: rgba(16, 185, 129, 0.08);
+  --border-user-bubble: rgba(16, 185, 129, 0.2);
+  --bg-assistant-bubble: rgba(255, 255, 255, 0.02);
+  --border-assistant-bubble: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme='light'] {
+  --bg-primary: #f8fafc;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #f1f5f9;
+  --border-color: rgba(15, 23, 42, 0.08);
+  --border-glow: rgba(99, 102, 241, 0.12);
+
+  --accent-primary: #4f46e5;
+  --accent-blue: #2563eb;
+  --accent-purple: #7c3aed;
+  --accent-teal: #0d9488;
+  --accent-rose: #e11d48;
+
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+
+  --bg-header-rgba: rgba(255, 255, 255, 0.7);
+  --bg-user-bubble: rgba(16, 185, 129, 0.06);
+  --border-user-bubble: rgba(16, 185, 129, 0.15);
+  --bg-assistant-bubble: rgba(15, 23, 42, 0.02);
+  --border-assistant-bubble: rgba(15, 23, 42, 0.06);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom Sleek Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.3);
+}
+
+a {
+  text-decoration: none;
+  color: var(--accent-purple);
+  transition: opacity 0.2s ease;
+}
+
+a:hover {
+  opacity: 0.8;
+}
