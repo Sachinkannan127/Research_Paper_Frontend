@@ -97,8 +97,13 @@
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Master WorkSpace Grids */
@@ -115,7 +120,7 @@
   flex-direction: column;
   height: 100%;
   background: radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.02) 0%, transparent 40%),
-              radial-gradient(circle at 90% 80%, rgba(16, 185, 129, 0.02) 0%, transparent 40%);
+    radial-gradient(circle at 90% 80%, rgba(16, 185, 129, 0.02) 0%, transparent 40%);
 }
 
 .chatContainer {
@@ -165,8 +170,15 @@
 }
 
 @keyframes welcomeFade {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .welcomeGraphic {
@@ -206,9 +218,20 @@
 }
 
 @keyframes pulseRing {
-  0% { transform: scale(0.9); opacity: 0.2; }
-  50% { transform: scale(1.15); opacity: 0.6; }
-  100% { transform: scale(0.9); opacity: 0.2; }
+  0% {
+    transform: scale(0.9);
+    opacity: 0.2;
+  }
+
+  50% {
+    transform: scale(1.15);
+    opacity: 0.6;
+  }
+
+  100% {
+    transform: scale(0.9);
+    opacity: 0.2;
+  }
 }
 
 .welcomePanel h2 {
@@ -276,8 +299,15 @@
 }
 
 @keyframes toastSlide {
-  from { transform: translateY(20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 .alertBody {

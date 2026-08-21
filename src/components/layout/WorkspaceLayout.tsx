@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, NavLink, Link, useNavigate } from 'react-router-dom';
+import { useAuth, useUser } from '@clerk/clerk-react';
+import { useBackendAuth } from '../../state/AuthContext';
 import {
   BookOpen, MessageSquare, Database, UploadCloud,
   Settings, User, Activity, RefreshCw, PanelLeftClose, PanelLeft,
-  Zap, BrainCircuit, Menu, Plus, Trash2, Edit3, Check, X,
-  Sun, Moon,
+  Menu, Plus, Trash2, Edit3, Check, X,
+  Sun, Moon, LogOut, Link2
 } from 'lucide-react';
 import { useSettings } from '../../state/SettingsContext';
 import { useServerHealth } from '../../hooks/useServerHealth';
@@ -16,12 +18,20 @@ const NAV_ITEMS = [
   { to: '/workspace/dashboard', label: 'Chat Console', icon: MessageSquare },
   { to: '/workspace/database', label: 'Vector Database', icon: Database },
   { to: '/workspace/upload', label: 'Upload & Config', icon: UploadCloud },
+  { to: '/workspace/connectors', label: 'Connectors', icon: Link2 },
   { to: '/workspace/settings', label: 'Settings', icon: Settings },
   { to: '/workspace/profile', label: 'Profile', icon: User },
 ];
 
 export const WorkspaceLayout: React.FC = () => {
-  const { model, activePdfName, theme, toggleTheme } = useSettings();
+  const { isLoaded, isSignedIn, signOut } = useAuth();
+  const { user: clerkUser } = useUser();
+  const { backendAuthenticated, isLoading, user: backendUser } = useBackendAuth();
+  const navigate = useNavigate();
+
+  const displayName = backendUser?.name || clerkUser?.fullName || 'Researcher';
+
+  const { activePdfName, theme, toggleTheme } = useSettings();
   const {
     activeChunk,
     sessions,
@@ -32,12 +42,44 @@ export const WorkspaceLayout: React.FC = () => {
     renameSession,
   } = useAssistant();
   const serverStatus = useServerHealth();
+
+  useEffect(() => {
+    if (isLoaded && !isLoading) {
+      if (!isSignedIn || !backendAuthenticated) {
+        navigate('/login');
+      }
+    }
+  }, [isLoaded, isLoading, isSignedIn, backendAuthenticated, navigate]);
+
   const [collapsed, setCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-
-  const navigate = useNavigate();
   const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
   const [editingTitle, setEditingTitle] = useState('');
+
+  if (!isLoaded || isLoading) {
+    return (
+      <div style={{
+        display: 'flex',
+        height: '100vh',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#0f172a',
+        color: '#fff',
+        flexDirection: 'column',
+        gap: '12px',
+        fontFamily: 'sans-serif'
+      }}>
+        <RefreshCw style={{ animation: 'spin 1s linear infinite' }} size={48} />
+        <p style={{ color: '#94a3b8' }}>Syncing with secure workspace...</p>
+        <style>{`
+          @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+          }
+        `}</style>
+      </div>
+    );
+  }
 
   const handleStartRename = (id: string, currentTitle: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -90,9 +132,37 @@ export const WorkspaceLayout: React.FC = () => {
       <aside className={`${styles.sidebar} ${collapsed ? styles.collapsed : ''} ${mobileSidebarOpen ? styles.mobileOpen : ''}`}>
         {/* Logo */}
         <Link to="/" className={styles.brand} onClick={() => setMobileSidebarOpen(false)}>
-          <div className={styles.logoMark}><BookOpen size={18} /></div>
-          {!collapsed && <span className={styles.brandLabel}>Paper Explorer</span>}
+          <div className={styles.logoMark}>
+            <div style={{ display: 'flex', gap: '3px', alignItems: 'center' }}>
+              <div style={{ width: '3px', height: '14px', background: 'white', borderRadius: '1px', transform: 'skewX(-15deg)' }} />
+              <div style={{ width: '3px', height: '14px', background: 'white', borderRadius: '1px', transform: 'skewX(-15deg)' }} />
+              <div style={{ width: '3px', height: '14px', background: 'white', borderRadius: '1px', transform: 'skewX(-15deg)' }} />
+            </div>
+          </div>
+          {!collapsed && <span className={styles.brandLabel}>Research Paper</span>}
         </Link>
+
+        {/* New Chat Button directly under Logo */}
+        <div style={{ padding: collapsed ? '4px 0' : '8px 4px 12px' }}>
+          {!collapsed ? (
+            <button
+              className={styles.newChatBtn}
+              onClick={handleNewChat}
+              title="New Chat Session"
+            >
+              <Plus size={16} />
+              <span>New Chat</span>
+            </button>
+          ) : (
+            <button
+              className={styles.newChatBtnCollapsed}
+              onClick={handleNewChat}
+              title="New Chat Session"
+            >
+              <Plus size={16} />
+            </button>
+          )}
+        </div>
 
         {/* Active doc chip */}
         {!collapsed && (
@@ -125,14 +195,6 @@ export const WorkspaceLayout: React.FC = () => {
           {!collapsed && (
             <div className={styles.sessionsHeader}>
               <span>Conversations</span>
-              <button
-                className={styles.newChatBtn}
-                onClick={handleNewChat}
-                title="New Chat Session"
-              >
-                <Plus size={12} />
-                <span>New Chat</span>
-              </button>
             </div>
           )}
 
@@ -228,12 +290,15 @@ export const WorkspaceLayout: React.FC = () => {
 
         {/* Footer status */}
         <div className={styles.sidebarFooter}>
-          <div className={styles.footerRow}>
-            <span className={`${styles.statusDot} ${statusClass}`} />
-            {!collapsed && <span className={styles.footerLabel}>
-              {model === 'fast' ? <Zap size={12} /> : <BrainCircuit size={12} />}
-              {model === 'fast' ? ' Fast Mode' : ' Smart Mode'}
-            </span>}
+          <div className={styles.footerRow} style={{ gap: '10px' }}>
+            <div style={{ width: '20px', height: '20px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0 }}>
+              {clerkUser?.imageUrl ? (
+                <img src={clerkUser.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ) : (
+                <User size={11} style={{ color: 'var(--text-secondary)' }} />
+              )}
+            </div>
+            {!collapsed && <span className={styles.footerLabel} style={{ color: 'var(--text-primary)', fontWeight: 500 }}>{displayName}</span>}
           </div>
         </div>
 
@@ -268,6 +333,20 @@ export const WorkspaceLayout: React.FC = () => {
               title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
             >
               {theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
+            </button>
+            <button
+              className={styles.themeToggleBtn}
+              onClick={() => {
+                signOut().then(() => {
+                  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
+                  fetch(`${apiBaseUrl}/api/auth/logout`, { method: 'POST' }).finally(() => {
+                    navigate('/login');
+                  });
+                });
+              }}
+              title="Sign Out"
+            >
+              <LogOut size={15} />
             </button>
             <span className={`${styles.statusPill} ${statusClass}`}>
               <StatusIcon size={12} className={serverStatus === 'checking' ? styles.spin : ''} />

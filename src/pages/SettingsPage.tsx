@@ -4,12 +4,12 @@ import { useSettings } from '../state/SettingsContext';
 import styles from './SettingsPage.module.css';
 
 export const SettingsPage: React.FC = () => {
-  const { model, setModel, useStream, setUseStream, voiceAutoplay, setVoiceAutoplay } = useSettings();
+  const { model, setModel, useStream, setUseStream, voiceAutoplay, setVoiceAutoplay, theme, toggleTheme } = useSettings();
   const [topK, setTopK] = useState(3);
   const [autoIngest, setAutoIngest] = useState(true);
   const [telemetry, setTelemetry] = useState(true);
   const [geminiKey, setGeminiKey] = useState('');
-  const [groqKey, setGroqKey] = useState('');
+  const [mistralKey, setMistralKey] = useState('');
 
   return (
     <div className={styles.page}>
@@ -43,7 +43,7 @@ export const SettingsPage: React.FC = () => {
         <div className={styles.settingRow}>
           <div className={styles.settingMeta}>
             <span className={styles.settingLabel}>Active LLM Model</span>
-            <span className={styles.settingDesc}>Choose between Groq Llama (fast) and Gemini 2.5 (smart).</span>
+            <span className={styles.settingDesc}>Choose between Mistral (fast) and Gemini 2.5 (smart).</span>
           </div>
           <div className={styles.modelToggle}>
             <button
@@ -93,13 +93,13 @@ export const SettingsPage: React.FC = () => {
         </div>
 
         <div className={styles.keyInput}>
-          <label className={styles.keyLabel}>Groq API Key</label>
+          <label className={styles.keyLabel}>Mistral API Key</label>
           <input
             type="password"
             className={styles.keyField}
-            placeholder="gsk_…"
-            value={groqKey}
-            onChange={e => setGroqKey(e.target.value)}
+            placeholder="Mistral key..."
+            value={mistralKey}
+            onChange={e => setMistralKey(e.target.value)}
           />
         </div>
       </section>
@@ -111,10 +111,22 @@ export const SettingsPage: React.FC = () => {
           <h3>Interface Preferences</h3>
         </div>
 
+        <div className={styles.settingRow}>
+          <div className={styles.settingMeta}>
+            <span className={styles.settingLabel}>Dark Mode Theme</span>
+            <span className={styles.settingDesc}>Toggle between dark and light themes for the workspace.</span>
+          </div>
+          <button className={styles.toggleSwitch} onClick={toggleTheme} aria-label="Toggle dark mode">
+            {theme === 'dark'
+              ? <ToggleRight size={32} className={styles.toggleOn} />
+              : <ToggleLeft size={32} className={styles.toggleOff} />}
+          </button>
+        </div>
+
         {[
-          { label: 'Auto-Ingest on Drop',  desc: 'Automatically ingest dropped PDFs into vector store.', val: autoIngest, set: setAutoIngest },
+          { label: 'Auto-Ingest on Drop', desc: 'Automatically ingest dropped PDFs into vector store.', val: autoIngest, set: setAutoIngest },
           { label: 'Voice Response Autoplay', desc: 'Automatically read aloud synthesized responses.', val: voiceAutoplay, set: setVoiceAutoplay },
-          { label: 'Usage Telemetry',      desc: 'Log anonymised query metrics for performance insight.', val: telemetry,   set: setTelemetry },
+          { label: 'Usage Telemetry', desc: 'Log anonymised query metrics for performance insight.', val: telemetry, set: setTelemetry },
         ].map(({ label, desc, val, set }) => (
           <div key={label} className={styles.settingRow}>
             <div className={styles.settingMeta}>
@@ -124,7 +136,7 @@ export const SettingsPage: React.FC = () => {
             <button className={styles.toggleSwitch} onClick={() => set(!val)} aria-label={label}>
               {val
                 ? <ToggleRight size={32} className={styles.toggleOn} />
-                : <ToggleLeft  size={32} className={styles.toggleOff} />}
+                : <ToggleLeft size={32} className={styles.toggleOff} />}
             </button>
           </div>
         ))}

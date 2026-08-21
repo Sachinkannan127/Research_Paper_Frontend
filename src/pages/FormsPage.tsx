@@ -4,6 +4,7 @@ import {
   Loader2, Check, AlertCircle 
 } from 'lucide-react';
 import { useSettings } from '../state/SettingsContext';
+import { apiFetch } from '../utils/api';
 import styles from './FormsPage.module.css';
 
 interface IngestionStep {
@@ -39,7 +40,7 @@ export const FormsPage: React.FC = () => {
     let isMounted = true;
     const fetchConfig = async () => {
       try {
-        const res = await fetch(`${apiBaseUrl}/config`);
+        const res = await apiFetch(`${apiBaseUrl}/config`);
         if (res.ok && isMounted) {
           const data = await res.json();
           if (data.system_prompt) setSystemPrompt(data.system_prompt);
@@ -90,7 +91,7 @@ export const FormsPage: React.FC = () => {
         const formData = new FormData();
         formData.append('file', fileObject);
 
-        const uploadRes = await fetch(`${apiBaseUrl}/config/upload`, {
+        const uploadRes = await apiFetch(`${apiBaseUrl}/config/upload`, {
           method: 'POST',
           body: formData,
         });
@@ -104,7 +105,7 @@ export const FormsPage: React.FC = () => {
       }
 
       // 2. Stream the ingestion process
-      const ingestRes = await fetch(`${apiBaseUrl}/config/ingest/stream`);
+      const ingestRes = await apiFetch(`${apiBaseUrl}/config/ingest/stream`);
       if (!ingestRes.ok) {
         throw new Error('Failed to initiate vector ingestion stream on backend');
       }
@@ -163,7 +164,7 @@ export const FormsPage: React.FC = () => {
     }
     
     try {
-      const res = await fetch(`${apiBaseUrl}/config/clear-database`, {
+      const res = await apiFetch(`${apiBaseUrl}/config/clear-database`, {
         method: 'POST',
       });
       if (res.ok) {
@@ -185,7 +186,7 @@ export const FormsPage: React.FC = () => {
 
   const handleSave = async () => {
     try {
-      const res = await fetch(`${apiBaseUrl}/config`, {
+      const res = await apiFetch(`${apiBaseUrl}/config`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

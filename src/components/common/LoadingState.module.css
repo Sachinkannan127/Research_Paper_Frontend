@@ -1,0 +1,134 @@
+.container {
+  display: flex;
+  width: fit-content;
+  align-items: center;
+  gap: 10px;
+}
+
+.surferContainer {
+  display: flex;
+  width: fit-content;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.headerRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Grid loader */
+.grid {
+  display: grid;
+  flex-shrink: 0;
+  grid-template-columns: repeat(3, 4px);
+  gap: 1.5px;
+}
+
+.cell {
+  width: 4px;
+  height: 4px;
+  background-color: var(--text-primary, #f8fafc);
+}
+
+.roundedFull {
+  border-radius: 9999px;
+}
+
+.roundedOne {
+  border-radius: 1px;
+}
+
+/* Video card */
+.videoCard {
+  margin-top: 8px;
+  width: 224px; /* w-56 */
+  overflow: hidden;
+  border-radius: 10px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -4px rgba(0, 0, 0, 0.3); /* shadow-overlay placeholder */
+  animation: pop-in 200ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  transform-origin: top left;
+}
+
+.videoWrapper {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  background: var(--bg-tertiary, #161925);
+}
+
+.video {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+}
+
+.videoFallback {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: var(--bg-tertiary, #161925);
+}
+
+.videoFallbackText {
+  padding-left: 12px;
+  padding-right: 12px;
+  text-align: center;
+  font-family: var(--font-mono, monospace);
+  font-size: 10px;
+  color: var(--text-muted, #64748b);
+}
+
+.label {
+  background-clip: text;
+  -webkit-background-clip: text;
+  text-shadow: none;
+  font-size: 13px;
+  font-weight: 500;
+  text-transparent: transparent;
+  color: transparent;
+  background-image: linear-gradient(90deg, var(--text-muted) 35%, var(--text-primary) 50%, var(--text-muted) 65%);
+  background-size: 200% 100%;
+  animation: shimmer-text 1.4s linear infinite;
+}
+
+.elapsed {
+  font-family: var(--font-mono, monospace);
+  font-size: 12px;
+  color: var(--text-muted, #64748b);
+}
+
+/* Animations */
+@keyframes pixel-on {
+  0%, 100% {
+    opacity: 0.15;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes shimmer-text {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

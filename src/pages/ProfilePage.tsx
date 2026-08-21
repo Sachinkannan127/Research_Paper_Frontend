@@ -1,72 +1,215 @@
-import React from 'react';
-import { User, Mail, ShieldCheck, Download, RefreshCw, BookOpen, MessageSquare, Clock } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Mail, ShieldCheck, Save, Loader2 } from 'lucide-react';
+import { useUser } from '@clerk/clerk-react';
+import { apiFetch } from '../utils/api';
 import styles from './ProfilePage.module.css';
 
-const stats = [
-  { icon: BookOpen,       label: 'Pages Ingested',  value: '483',   unit: 'pages' },
-  { icon: MessageSquare,  label: 'Queries This Month', value: '1,280', unit: 'queries' },
-  { icon: Clock,          label: 'Avg. Latency',    value: '0.34',  unit: 'sec' },
-];
+export const ProfilePage: React.FC = () => {
+  const { user: clerkUser } = useUser();
+  
+  const [name, setName] = useState('');
+  const [avatarUrl, setAvatarUrl] = useState('');
+  const [mobile, setMobile] = useState('');
+  const [address, setAddress] = useState('');
+  const [bio, setBio] = useState('');
+  const [email, setEmail] = useState('');
+  
+  const [loadingProfile, setLoadingProfile] = useState(true);
+  const [savingProfile, setSavingProfile] = useState(false);
+  const [saveMessage, setSaveMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
-export const ProfilePage: React.FC = () => (
-  <div className={styles.page}>
-    <div className={styles.pageHeader}>
-      <h2 className={styles.pageTitle}>Your Profile</h2>
-      <p className={styles.pageSub}>Manage identity, key access, and usage metrics.</p>
-    </div>
+  // Fetch detailed profile from backend
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        setLoadingProfile(true);
+        const res = await apiFetch('/api/auth/profile');
+        if (res.ok) {
+          const data = await res.json();
+          setName(data.name || clerkUser?.fullName || clerkUser?.username || '');
+          setAvatarUrl(data.avatar_url || clerkUser?.imageUrl || '');
+          setMobile(data.mobile || '');
+          setAddress(data.address || '');
+          setBio(data.bio || '');
+          setEmail(data.email || clerkUser?.primaryEmailAddress?.emailAddress || '');
+        }
+      } catch (err) {
+        console.error("Failed to load profile", err);
+      } finally {
+        setLoadingProfile(false);
+      }
+    };
+    
+    if (clerkUser) {
+      fetchProfile();
+    }
+  }, [clerkUser]);
 
-    {/* Identity Card */}
-    <div className={styles.identityCard}>
-      <div className={styles.avatarWrapper}>
-        <div className={styles.avatar}>
-          <User size={36} />
-        </div>
-        <div className={styles.avatarBadge}>
-          <ShieldCheck size={12} />
-        </div>
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      setSavingProfile(true);
+      setSaveMessage(null);
+      
+      const res = await apiFetch('/api/auth/profile', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          name,
+          avatar_url: avatarUrl,
+          mobile,
+          address,
+          bio
+        })
+      });
+      
+      if (res.ok) {
+        setSaveMessage({ type: 'success', text: 'Changes saved successfully!' });
+        setTimeout(() => setSaveMessage(null), 3000);
+      } else {
+        const errorData = await res.json();
+        setSaveMessage({ type: 'error', text: errorData.detail || 'Failed to save changes.' });
+      }
+    } catch (err) {
+      console.error("Error saving profile", err);
+      setSaveMessage({ type: 'error', text: 'An unexpected error occurred.' });
+    } finally {
+      setSavingProfile(false);
+    }
+  };
+
+  const getInitial = () => {
+    if (name) return name.charAt(0).toUpperCase();
+    if (email) return email.charAt(0).toUpperCase();
+    return 'P';
+  };
+
+  if (loadingProfile) {
+    return (
+      <div className={styles.loadingContainer}>
+        <Loader2 className={styles.spinner} size={40} />
+        <p>Loading your profile details...</p>
       </div>
-      <div className={styles.identityInfo}>
-        <h3 className={styles.displayName}>Dr. Evelyn Carter</h3>
-        <div className={styles.emailRow}>
-          <Mail size={14} className={styles.emailIcon} />
-          <span>evelyn@university.edu</span>
-        </div>
-        <span className={styles.roleBadge}>Academic Premium</span>
-      </div>
-    </div>
+    );
+  }
 
-    {/* Telemetry Stats Grid */}
-    <div className={styles.statsGrid}>
-      {stats.map(({ icon: Icon, label, value, unit }) => (
-        <div key={label} className={styles.statCard}>
-          <div className={styles.statIconWrapper}>
-            <Icon size={18} />
+  return (
+    <div className={styles.page}>
+      <form onSubmit={handleSave} className={styles.profileForm}>
+        {/* Header Block Card */}
+        <div className={styles.headerCard}>
+          <div className={styles.avatarWrapper}>
+            {avatarUrl ? (
+              <img src={avatarUrl} alt={name} className={styles.avatarImage} onError={() => setAvatarUrl('')} />
+            ) : (
+              <div className={styles.avatarInitial}>{getInitial()}</div>
+            )}
           </div>
-          <div className={styles.statContent}>
-            <span className={styles.statValue}>{value}</span>
-            <span className={styles.statUnit}>{unit}</span>
+          <div className={styles.headerInfo}>
+            <h3 className={styles.headerName}>{name || 'Researcher'}</h3>
+            <div className={styles.headerEmail}>
+              <Mail size={14} className={styles.mailIcon} />
+              <span>{email}</span>
+            </div>
+            <div className={styles.verifiedBadge}>
+              <ShieldCheck size={14} className={styles.badgeIcon} />
+              <span>Verified</span>
+            </div>
           </div>
-          <span className={styles.statLabel}>{label}</span>
         </div>
-      ))}
-    </div>
 
-    {/* Actions */}
-    <div className={styles.actionsSection}>
-      <h4 className={styles.sectionTitle}>Account Actions</h4>
-      <div className={styles.actionBtns}>
-        <button className={styles.actionBtn}>
-          <RefreshCw size={15} /> Change Password
-        </button>
-        <button className={styles.actionBtn}>
-          <ShieldCheck size={15} /> Revoke API Token
-        </button>
-        <button className={`${styles.actionBtn} ${styles.actionBtnTeal}`}>
-          <Download size={15} /> Export Usage Report
-        </button>
-      </div>
+        {/* Form Fields */}
+        <div className={styles.formFields}>
+          {/* Username */}
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Username</label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className={styles.input}
+              placeholder="Your username"
+              required
+            />
+            <span className={styles.helperText}>Pulled from your sign-in provider — change it any time.</span>
+          </div>
+
+          {/* Avatar URL */}
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Avatar URL</label>
+            <input
+              type="text"
+              value={avatarUrl}
+              onChange={(e) => setAvatarUrl(e.target.value)}
+              className={styles.input}
+              placeholder="https://example.com/avatar.jpg"
+            />
+            <span className={styles.helperText}>Link to an image. Leave blank to use your initial.</span>
+          </div>
+
+          {/* Mobile & Address in Two Columns */}
+          <div className={styles.grid2Col}>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Mobile</label>
+              <input
+                type="text"
+                value={mobile}
+                onChange={(e) => setMobile(e.target.value)}
+                className={styles.input}
+                placeholder="+91 90000 00000"
+              />
+            </div>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Address</label>
+              <input
+                type="text"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                className={styles.input}
+                placeholder="City, Country"
+              />
+            </div>
+          </div>
+
+          {/* Bio */}
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Bio</label>
+            <textarea
+              value={bio}
+              onChange={(e) => setBio(e.target.value)}
+              className={styles.textarea}
+              placeholder="A sentence about you."
+              rows={4}
+            />
+          </div>
+
+          {/* Messages */}
+          {saveMessage && (
+            <div className={saveMessage.type === 'success' ? styles.successMessage : styles.errorMessage}>
+              {saveMessage.text}
+            </div>
+          )}
+
+          {/* Submit Button */}
+          <button type="submit" disabled={savingProfile} className={styles.submitBtn}>
+            {savingProfile ? (
+              <>
+                <Loader2 className={styles.btnSpinner} size={16} />
+                <span>Saving changes...</span>
+              </>
+            ) : (
+              <>
+                <Save size={16} />
+                <span>Save changes</span>
+              </>
+            )}
+          </button>
+        </div>
+      </form>
     </div>
-  </div>
-);
+  );
+};
 
 export default ProfilePage;

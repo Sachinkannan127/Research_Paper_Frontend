@@ -1,7 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, Activity, RefreshCw, PanelLeftClose, PanelLeft } from 'lucide-react';
+import { BookOpen, Activity, RefreshCw, PanelLeftClose, PanelLeft, Sun, Moon } from 'lucide-react';
 import { ServerStatus } from '../../hooks/useServerHealth';
+import { useSettings } from '../../state/SettingsContext';
 import styles from './TopHeader.module.css';
 
 interface TopHeaderProps {
@@ -15,6 +16,7 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
   sidebarCollapsed,
   onToggleSidebar,
 }) => {
+  const { theme, toggleTheme } = useSettings();
   return (
     <header className={styles.header}>
       <div className={styles.left}>
@@ -38,6 +40,15 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
       </div>
 
       <div className={styles.right}>
+        <button
+          className={styles.toggleBtn}
+          onClick={toggleTheme}
+          aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+          title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+        >
+          {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+        </button>
+
         {serverStatus === 'checking' && (
           <span className={`${styles.statusBadge} ${styles.statusChecking}`}>
             <RefreshCw size={12} className={styles.spin} /> Checking Server…

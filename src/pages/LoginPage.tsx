@@ -1,19 +1,10 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { BookOpen, Key, Mail, ArrowRight, ShieldCheck } from 'lucide-react';
+import React from 'react';
+import { BookOpen, ShieldCheck } from 'lucide-react';
+import { SignIn } from '@clerk/clerk-react';
+import { dark } from '@clerk/themes';
 import styles from './LoginPage.module.css';
 
 export const LoginPage: React.FC = () => {
-  const navigate = useNavigate();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Simulate login for this prototype and redirect to workspace dashboard
-    navigate('/workspace/dashboard');
-  };
-
   return (
     <div className={styles.container}>
       {/* Left decorative/constellation panel */}
@@ -41,63 +32,28 @@ export const LoginPage: React.FC = () => {
 
       {/* Right Form Card Panel */}
       <div className={styles.formPanel}>
-        <div className={styles.card}>
-          <div className={styles.cardHeader}>
-            <h2>Welcome Back</h2>
-            <p>Access your research collections and query console.</p>
-          </div>
-
-          <form onSubmit={handleSubmit} className={styles.form}>
-            <div className={styles.inputGroup}>
-              <label htmlFor="email" className={styles.label}>Email Address</label>
-              <div className={styles.inputWrapper}>
-                <Mail size={16} className={styles.inputIcon} />
-                <input
-                  type="email"
-                  id="email"
-                  className={styles.input}
-                  placeholder="name@university.edu"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </div>
-            </div>
-
-            <div className={styles.inputGroup}>
-              <div className={styles.labelRow}>
-                <label htmlFor="password" className={styles.label}>Password</label>
-                <a href="#reset" className={styles.forgotLink} onClick={(e) => e.preventDefault()}>Forgot?</a>
-              </div>
-              <div className={styles.inputWrapper}>
-                <Key size={16} className={styles.inputIcon} />
-                <input
-                  type="password"
-                  id="password"
-                  className={styles.input}
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-              </div>
-            </div>
-
-            <div className={styles.rememberRow}>
-              <input type="checkbox" id="remember" className={styles.checkbox} />
-              <label htmlFor="remember" className={styles.checkboxLabel}>Remember this session</label>
-            </div>
-
-            <button type="submit" className={styles.submitBtn}>
-              Sign In <ArrowRight size={16} />
-            </button>
-          </form>
-
-          <div className={styles.footer}>
-            <span>New researcher? </span>
-            <Link to="/register" className={styles.accentLink}>Create account</Link>
-          </div>
-        </div>
+        <SignIn 
+          signUpUrl="/register" 
+          forceRedirectUrl="/workspace/dashboard"
+          appearance={{
+            baseTheme: dark,
+            elements: {
+              card: {
+                boxShadow: 'none',
+                backgroundColor: 'transparent',
+              },
+              formButtonPrimary: {
+                backgroundColor: '#6366f1',
+                '&:hover': {
+                  backgroundColor: '#4f46e5',
+                }
+              },
+              footerActionLink: {
+                color: '#6366f1',
+              }
+            }
+          }}
+        />
       </div>
     </div>
   );

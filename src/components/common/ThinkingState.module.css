@@ -1,0 +1,239 @@
+.container {
+  display: flex;
+  width: 100%;
+  max-width: 380px; /* max-w-95 */
+  flex-direction: column;
+}
+
+.headerBtn {
+  margin-left: -6px;
+  margin-right: -6px;
+  display: flex;
+  width: fit-content;
+  align-items: center;
+  gap: 8px;
+  border-radius: 6px;
+  padding: 4px 6px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: background-color 0.1s ease;
+}
+
+.headerBtn:hover {
+  background-color: var(--bg-tertiary, rgba(255, 255, 255, 0.05));
+}
+
+.shimmerLabel {
+  background-clip: text;
+  -webkit-background-clip: text;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  color: transparent;
+  background-image: linear-gradient(90deg, var(--text-muted) 35%, var(--text-primary) 50%, var(--text-muted) 65%);
+  background-size: 200% 100%;
+  animation: shimmer-text 1.4s linear infinite;
+}
+
+.doneLabel {
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--text-secondary);
+  animation: fade-in 350ms ease-out both;
+}
+
+.expandableGrid {
+  display: grid;
+  transition: grid-template-rows 400ms cubic-bezier(0.23, 1, 0.32, 1), opacity 400ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.innerContent {
+  overflow: hidden;
+}
+
+.traceWrapper {
+  position: relative;
+  margin-top: 4px;
+  margin-left: 5px;
+  padding-left: 16px;
+}
+
+.timelineLine {
+  position: absolute;
+  left: 3px;
+  width: 1px;
+  background-color: var(--border-color, rgba(255, 255, 255, 0.1));
+  top: -8px;
+  transition: height 500ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.traceList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.queryRow {
+  display: flex;
+  height: 24px;
+  align-items: center;
+  gap: 8px;
+  padding-left: 6px;
+  padding-right: 6px;
+}
+
+.queryText {
+  font-size: 12.5px;
+  color: var(--text-secondary);
+}
+
+.dot {
+  display: flex;
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  color: #ffffff;
+}
+
+.bgAccent {
+  background-color: var(--accent-primary, #6366f1);
+}
+
+.bgOrange {
+  background-color: #f97316;
+}
+
+.bgGreen {
+  background-color: var(--accent-teal, #10b981);
+}
+
+.rowPrimaryText {
+  min-width: 0;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  font-size: 12.5px;
+}
+
+.reasoningText {
+  white-space: normal;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.standardText {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.searchText {
+  text-decoration: underline;
+}
+
+.rowSecondaryText {
+  flex-shrink: 0;
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+
+.fontMono {
+  font-family: var(--font-mono, monospace);
+}
+
+.changeNumbers {
+  flex-shrink: 0;
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.textGreen {
+  color: var(--accent-teal, #10b981);
+}
+
+.textRed {
+  color: var(--accent-rose, #f43f5e);
+}
+
+.rowBase {
+  display: flex;
+  min-height: 28px; /* min-h-7 */
+  width: 100%;
+  align-items: center;
+  gap: 8px;
+  border-radius: 6px;
+  padding: 2px 6px;
+  text-align: left;
+  border: none;
+  background: transparent;
+}
+
+.rowInteractive {
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.rowInteractive:hover {
+  background-color: var(--bg-tertiary, rgba(255, 255, 255, 0.03));
+}
+
+.rowSelected {
+  background-color: var(--bg-secondary, rgba(255, 255, 255, 0.08));
+}
+
+.moreCount {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.spinner {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+  border-radius: 9999px;
+  border: 1.5px solid var(--border-color, rgba(255, 255, 255, 0.1));
+  border-top-color: var(--text-secondary, #94a3b8);
+  animation: spin 700ms linear infinite;
+}
+
+/* Animations */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes shimmer-text {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -1,5 +1,6 @@
 import { useAssistant, PipelineStep } from '../state/AssistantContext';
 import { useSettings } from '../state/SettingsContext';
+import { apiFetch } from '../utils/api';
 
 export const useChatService = () => {
   const {
@@ -51,7 +52,7 @@ export const useChatService = () => {
     });
 
     try {
-      const response = await fetch(
+      const response = await apiFetch(
         `${apiBaseUrl}/chat`,
         {
           method: 'POST',
@@ -135,7 +136,7 @@ export const useChatService = () => {
     });
 
     try {
-      const response = await fetch(
+      const response = await apiFetch(
         `${apiBaseUrl}/chat/stream`,
         {
           method: 'POST',
@@ -320,7 +321,7 @@ export const useChatService = () => {
       const formData = new FormData();
       formData.append('file', audioBlob, 'recording.webm');
 
-      const response = await fetch(`${apiBaseUrl}/voice/process`, {
+      const response = await apiFetch(`${apiBaseUrl}/voice/process`, {
         method: 'POST',
         body: formData,
       });

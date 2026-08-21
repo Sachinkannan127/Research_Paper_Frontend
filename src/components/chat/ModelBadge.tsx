@@ -10,16 +10,16 @@ export const ModelBadge: React.FC<ModelBadgeProps> = ({ modelName, attempts = 1 
   if (!modelName) return null;
 
   const isGemini = modelName.toLowerCase().includes('gemini');
-  const isGroq = modelName.toLowerCase().includes('groq') || modelName.toLowerCase().includes('llama');
+  const isMistral = modelName.toLowerCase().includes('mistral') || modelName.toLowerCase().includes('llama') || modelName.toLowerCase().includes('groq');
 
   let cleanName = modelName;
   if (isGemini) {
     cleanName = 'Gemini 2.5 Flash';
-  } else if (isGroq) {
-    cleanName = 'Llama 3.1 (Groq)';
+  } else if (isMistral) {
+    cleanName = 'Mistral Small';
   }
 
-  const badgeClass = isGemini ? styles.gemini : isGroq ? styles.groq : styles.generic;
+  const badgeClass = isGemini ? styles.gemini : isMistral ? styles.mistral : styles.generic;
 
   return (
     <div className={styles.badgeWrapper}>

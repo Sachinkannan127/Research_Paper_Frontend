@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useAuth } from '@clerk/clerk-react';
 
 export interface RetrievedChunk {
   text: string;
@@ -63,22 +64,38 @@ interface AssistantContextType {
 const AssistantContext = createContext<AssistantContextType | undefined>(undefined);
 
 export const AssistantProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [sessions, setSessions] = useState<ChatSession[]>(() => {
-    const saved = localStorage.getItem('assistant_sessions');
-    return saved ? JSON.parse(saved) : [];
-  });
-
-  const [activeSessionId, setActiveSessionId] = useState<string | null>(() => {
-    const saved = localStorage.getItem('assistant_active_session_id');
-    return saved || null;
-  });
+  const { userId, isLoaded } = useAuth();
+  
+  const [sessions, setSessions] = useState<ChatSession[]>([]);
+  const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
+  const [hasLoaded, setHasLoaded] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
   const [activeChunk, setActiveChunk] = useState<RetrievedChunk | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  // Load user-scoped configurations on mount / auth status change
+  useEffect(() => {
+    if (!isLoaded) return;
+    setHasLoaded(false);
+    
+    const sessionsKey = userId ? `assistant_sessions_${userId}` : 'assistant_sessions';
+    const activeSessionKey = userId ? `assistant_active_session_id_${userId}` : 'assistant_active_session_id';
+
+    const savedSessions = localStorage.getItem(sessionsKey);
+    const parsedSessions = savedSessions ? JSON.parse(savedSessions) : [];
+    
+    const savedActiveId = localStorage.getItem(activeSessionKey);
+    
+    setSessions(parsedSessions);
+    setActiveSessionId(savedActiveId || null);
+    setHasLoaded(true);
+  }, [userId, isLoaded]);
+
   // Proactive initialization of first session if none exists
   useEffect(() => {
+    if (!hasLoaded) return;
+    
     if (sessions.length === 0) {
       const defaultId = crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2, 11);
       const newSession: ChatSession = {
@@ -92,20 +109,24 @@ export const AssistantProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     } else if (!activeSessionId) {
       setActiveSessionId(sessions[0].id);
     }
-  }, [sessions, activeSessionId]);
+  }, [sessions, activeSessionId, hasLoaded]);
 
   // Sync state to local storage
   useEffect(() => {
-    localStorage.setItem('assistant_sessions', JSON.stringify(sessions));
-  }, [sessions]);
+    if (!isLoaded || !hasLoaded) return;
+    const sessionsKey = userId ? `assistant_sessions_${userId}` : 'assistant_sessions';
+    localStorage.setItem(sessionsKey, JSON.stringify(sessions));
+  }, [sessions, userId, isLoaded, hasLoaded]);
 
   useEffect(() => {
+    if (!isLoaded || !hasLoaded) return;
+    const activeSessionKey = userId ? `assistant_active_session_id_${userId}` : 'assistant_active_session_id';
     if (activeSessionId) {
-      localStorage.setItem('assistant_active_session_id', activeSessionId);
+      localStorage.setItem(activeSessionKey, activeSessionId);
     } else {
-      localStorage.removeItem('assistant_active_session_id');
+      localStorage.removeItem(activeSessionKey);
     }
-  }, [activeSessionId]);
+  }, [activeSessionId, userId, isLoaded, hasLoaded]);
 
   const createSession = (title = 'New Conversation') => {
     const id = crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2, 11);

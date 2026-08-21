@@ -12,6 +12,7 @@ import { ProfilePage } from './pages/ProfilePage';
 import { SettingsPage } from './pages/SettingsPage';
 import { TablesPage } from './pages/TablesPage';
 import { FormsPage } from './pages/FormsPage';
+import { ConnectorsPage } from './pages/ConnectorsPage';
 
 // Workspace shell layout
 import { WorkspaceLayout } from './components/layout/WorkspaceLayout';
@@ -32,6 +33,7 @@ export const App: React.FC = () => {
             <Route path="dashboard" element={<DashboardPage />} />
             <Route path="database" element={<TablesPage />} />
             <Route path="upload" element={<FormsPage />} />
+            <Route path="connectors" element={<ConnectorsPage />} />
             <Route path="settings" element={<SettingsPage />} />
             <Route path="profile" element={<ProfilePage />} />
           </Route>

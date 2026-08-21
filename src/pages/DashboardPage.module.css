@@ -2,8 +2,7 @@
   display: flex;
   flex-direction: row;
   height: 100%;
-  background: radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.02) 0%, transparent 40%),
-              radial-gradient(circle at 90% 80%, rgba(16, 185, 129, 0.02) 0%, transparent 40%);
+  background: var(--bg-primary);
   overflow: hidden;
 }
 
@@ -11,69 +10,66 @@
 .subSidebar {
   width: 260px;
   border-right: 1px solid var(--border-color);
-  background: rgba(13, 17, 23, 0.5);
-  backdrop-filter: blur(12px);
+  background: var(--bg-secondary);
   display: flex;
   flex-direction: column;
   height: 100%;
 }
 
 .subSidebarHeader {
-  padding: 20px 16px;
+  padding: 16px 12px;
   border-bottom: 1px solid var(--border-color);
 }
 
 .newChatBtn {
   width: 100%;
-  padding: 10px 14px;
-  background: linear-gradient(135deg, var(--accent-purple), #4f46e5);
-  border: none;
-  border-radius: 10px;
-  color: white;
+  padding: 8px 12px;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-primary);
   font-weight: 500;
   font-size: 0.88rem;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 8px;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
   transition: all 0.2s ease;
 }
 
 .newChatBtn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(99, 102, 241, 0.3);
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .sessionList {
   flex: 1;
   overflow-y: auto;
-  padding: 16px 8px;
+  padding: 12px 6px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
 .sessionItem {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 12px;
-  border-radius: 8px;
+  padding: 8px 10px;
+  border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
   color: var(--text-secondary);
 }
 
 .sessionItem:hover {
-  background: rgba(255, 255, 255, 0.04);
-  color: white;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-primary);
 }
 
 .sessionItemActive {
-  background: rgba(255, 255, 255, 0.08) !important;
-  color: white !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: var(--text-primary) !important;
   font-weight: 500;
 }
 
@@ -86,12 +82,12 @@
 }
 
 .bubbleIcon {
-  color: var(--text-secondary);
+  color: var(--text-muted);
   flex-shrink: 0;
 }
 
 .sessionItemActive .bubbleIcon {
-  color: var(--accent-purple);
+  color: var(--text-primary);
 }
 
 .sessionTitle {
@@ -103,9 +99,8 @@
 
 .sessionActions {
   display: flex;
-  gap: 6px;
+  gap: 4px;
   opacity: 0;
-  transition: opacity 0.2s ease;
 }
 
 .sessionItem:hover .sessionActions {
@@ -115,8 +110,8 @@
 .sessionActionBtn {
   background: transparent;
   border: none;
-  color: var(--text-secondary);
-  padding: 3px;
+  color: var(--text-muted);
+  padding: 2px;
   cursor: pointer;
   border-radius: 4px;
   display: flex;
@@ -126,8 +121,8 @@
 }
 
 .sessionActionBtn:hover {
-  color: white;
-  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.06);
 }
 
 /* Rename inline form */
@@ -182,24 +177,24 @@
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid var(--border-color);
-  background: var(--bg-secondary);
+  background: transparent;
 }
 
 .chatHeaderTitle {
   font-size: 0.88rem;
-  color: var(--text-secondary);
+  color: var(--text-primary);
   font-weight: 500;
 }
 
 .chatHeaderControls {
   display: flex;
-  gap: 12px;
+  gap: 8px;
 }
 
 .controlHeaderBtn {
   background: transparent;
   border: 1px solid var(--border-color);
-  border-radius: 6px;
+  border-radius: 12px;
   color: var(--text-secondary);
   padding: 4px 10px;
   font-size: 0.8rem;
@@ -213,38 +208,48 @@
 
 .controlHeaderBtn:hover {
   color: var(--text-primary);
-  background: var(--bg-tertiary);
-  border-color: var(--accent-primary);
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .chatWorkspace {
   flex: 1;
   overflow-y: auto;
-  padding: 24px 24px 10px;
+  padding: 24px 0 10px;
+}
+
+.chatWorkspaceEmpty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .messagesList {
-  max-width: 820px;
-  margin: 0 auto;
+  max-width: 100%;
   display: flex;
   flex-direction: column;
 }
 
 .loadingContainer {
-  margin: 12px 0 24px 50px;
+  max-width: 768px;
+  margin: 12px auto 24px;
+  width: 100%;
+  padding: 0 12px;
+  box-sizing: border-box;
 }
 
 .footerWrapper {
-  max-width: 820px;
   width: 100%;
-  margin: 0 auto;
-  padding: 10px 24px 28px;
+  padding: 10px 0 24px;
   z-index: 10;
 }
 
 /* ---- Suggestions Panel ---- */
 .suggestionsContainer {
-  margin: 28px 0 20px 50px;
+  max-width: 768px;
+  margin: 24px auto 12px;
+  width: 100%;
+  padding: 0 12px;
+  box-sizing: border-box;
   animation: welcomeFade 0.4s ease-out;
 }
 
@@ -259,20 +264,20 @@
 }
 
 .suggestSparkle {
-  color: var(--accent-purple);
+  color: var(--accent-primary);
 }
 
 .suggestList {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 8px;
 }
 
 .suggestCard {
-  background: var(--bg-secondary);
+  background: transparent;
   border: 1px solid var(--border-color);
-  border-radius: 10px;
-  padding: 10px 16px;
+  border-radius: 12px;
+  padding: 12px 16px;
   color: var(--text-secondary);
   font-size: 0.82rem;
   text-align: left;
@@ -283,18 +288,18 @@
 }
 
 .suggestCard:hover {
-  background: var(--bg-tertiary);
+  background: rgba(255, 255, 255, 0.02);
   color: var(--text-primary);
-  border-color: var(--accent-primary);
-  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.15);
 }
 
 /* ---- Welcome Empty State ---- */
 .welcomePanel {
   max-width: 580px;
-  margin: 8vh auto 0;
+  margin: 0 auto;
   text-align: center;
   animation: welcomeFade 0.6s ease-out;
+  padding: 0 16px;
 }
 
 @keyframes welcomeFade {
@@ -304,35 +309,35 @@
 
 .welcomeGraphic {
   position: relative;
-  width: 120px;
-  height: 120px;
-  margin: 0 auto 28px;
+  width: 96px;
+  height: 96px;
+  margin: 0 auto 24px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .graphicIcon {
-  color: var(--accent-purple);
-  filter: drop-shadow(0 0 10px rgba(139, 92, 246, 0.5));
+  color: var(--accent-primary);
+  filter: drop-shadow(0 0 10px rgba(16, 163, 127, 0.25));
   z-index: 2;
 }
 
 .ring {
   position: absolute;
   border-radius: 50%;
-  border: 1px solid rgba(139, 92, 246, 0.15);
+  border: 1px solid rgba(16, 163, 127, 0.15);
 }
 
 .glow1 {
-  width: 70px;
-  height: 70px;
+  width: 60px;
+  height: 60px;
   animation: pulseRing 4s infinite ease-in-out;
 }
 
 .glow2 {
-  width: 100px;
-  height: 100px;
+  width: 90px;
+  height: 90px;
   animation: pulseRing 4s infinite ease-in-out 1.5s;
 }
 
@@ -342,53 +347,55 @@
   100% { transform: scale(0.9); opacity: 0.2; }
 }
 
-.welcomePanel h2 {
-  font-size: 1.85rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 12px;
-  letter-spacing: -0.01em;
-}
-
-.welcomePanel p {
-  color: var(--text-secondary);
-  font-size: 0.95rem;
-  line-height: 1.6;
-  margin-bottom: 32px;
-}
-
 .guideCard {
-  background: var(--bg-tertiary);
+  background: var(--bg-secondary);
   border: 1px solid var(--border-color);
-  border-radius: 16px;
-  padding: 20px 24px;
+  border-radius: 12px;
+  padding: 20px 28px;
   text-align: left;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  margin-top: 24px;
+  width: fit-content;
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .guideCard h4 {
   font-size: 0.88rem;
   color: var(--text-primary);
-  font-weight: 600;
-  margin-bottom: 10px;
+  font-weight: 500;
+  margin-bottom: 12px;
 }
 
-.guideCard ul { list-style: none; }
+.guideCard ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
 
 .guideCard li {
   font-size: 0.85rem;
   color: var(--text-secondary);
   margin-bottom: 8px;
-  padding-left: 14px;
+  padding-left: 20px;
   position: relative;
+  cursor: pointer;
+  transition: color 0.15s;
+  line-height: 1.4;
+}
+
+.guideCard li:hover {
+  color: var(--text-primary);
 }
 
 .guideCard li::before {
   content: "•";
-  color: var(--accent-purple);
-  font-weight: bold;
+  color: var(--accent-primary);
   position: absolute;
-  left: 0;
+  left: 2px;
+  top: -1px;
+  font-size: 1.1rem;
 }
 
 .guideCard li:last-child { margin-bottom: 0; }
@@ -404,21 +411,19 @@
   display: none; /* Hidden on desktop */
   align-items: center;
   gap: 8px;
-  background: rgba(99, 102, 241, 0.1);
-  border: 1px solid rgba(99, 102, 241, 0.25);
-  border-radius: 8px;
-  color: #818cf8;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  color: var(--text-secondary);
   padding: 6px 12px;
   font-size: 0.82rem;
-  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .toggleSessionsBtn:hover {
-  background: rgba(99, 102, 241, 0.2);
-  color: white;
-  border-color: rgba(99, 102, 241, 0.4);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-primary);
 }
 
 .btnText {
@@ -431,7 +436,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(4px);
   z-index: 175;
   animation: fadeIn 0.2s ease-out;
@@ -478,11 +483,11 @@
   }
 
   .chatWorkspace {
-    padding: 16px;
+    padding: 16px 0;
   }
 
   .footerWrapper {
-    padding: 10px 16px 20px;
+    padding: 10px 12px 20px;
   }
 
   /* Stack suggested questions vertically on mobile */
@@ -492,19 +497,14 @@
   }
 
   .suggestionsContainer {
-    margin-left: 12px;
+    padding: 0 16px;
   }
 
   .loadingContainer {
-    margin-left: 12px;
+    padding: 0 16px;
   }
 
   .welcomePanel {
     margin-top: 4vh;
   }
-
-  .welcomePanel h2 {
-    font-size: 1.5rem;
-  }
 }
-

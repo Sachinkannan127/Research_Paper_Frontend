@@ -1,4 +1,6 @@
 import React, { createContext, useContext, useState } from 'react';
+import { apiFetch } from '../utils/api';
+import { useBackendAuth } from './AuthContext';
 
 export type ModelType = 'fast' | 'smart';
 
@@ -48,9 +50,12 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const rawApiUrl = import.meta.env.VITE_API_BASE_URL || `https://research-paper-assistant-ylic.onrender.com`;
   const apiBaseUrl = rawApiUrl.replace('localhost', '127.0.0.1').replace(/\/$/, '');
 
+  const { backendAuthenticated } = useBackendAuth();
+
   const refreshConfig = async () => {
+    if (!backendAuthenticated) return;
     try {
-      const res = await fetch(`${apiBaseUrl}/config`);
+      const res = await apiFetch(`${apiBaseUrl}/config`);
       if (res.ok) {
         const data = await res.json();
         if (data.active_pdf_name) {
@@ -64,9 +69,10 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   React.useEffect(() => {
     refreshConfig();
-  }, [apiBaseUrl]);
+  }, [apiBaseUrl, backendAuthenticated]);
 
   React.useEffect(() => {
+    console.log("[Theme Context] useEffect trigger - Setting data-theme on html to:", theme);
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
 
@@ -98,8 +104,10 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   };
 
   const toggleTheme = () => {
+    console.log("[Theme Context] toggleTheme called. Current theme state:", theme);
     setThemeBase((prev) => {
       const next = prev === 'dark' ? 'light' : 'dark';
+      console.log("[Theme Context] Setting next theme state to:", next);
       localStorage.setItem('assistant_theme', next);
       return next;
     });

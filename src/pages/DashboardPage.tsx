@@ -2,10 +2,10 @@ import React, { useRef, useEffect } from 'react';
 import { useAssistant } from '../state/AssistantContext';
 import { ChatBubble } from '../components/chat/ChatBubble';
 import { ChatInput } from '../components/chat/ChatInput';
-import { Loader } from '../components/common/Loader';
+import { LoadingState } from '../components/common/LoadingState';
 import { useAudioPlayback } from '../hooks/useAudioPlayback';
 import { useSettings } from '../state/SettingsContext';
-import { BookOpen, Download, RotateCcw, Sparkles } from 'lucide-react';
+import { BookOpen, Download, RotateCcw, Cpu, FileText } from 'lucide-react';
 import styles from './DashboardPage.module.css';
 
 export const DashboardPage: React.FC = () => {
@@ -43,8 +43,6 @@ export const DashboardPage: React.FC = () => {
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isLoading]);
-
-
 
   // Export Chat to Markdown
   const exportToMarkdown = () => {
@@ -143,11 +141,11 @@ export const DashboardPage: React.FC = () => {
           )}
         </header>
 
-        <div className={styles.chatWorkspace}>
+        <div className={`${styles.chatWorkspace} ${messages.length === 0 ? styles.chatWorkspaceEmpty : ''}`}>
           {messages.length === 0 ? (
             <div className={styles.welcomePanel}>
               <div className={styles.welcomeGraphic}>
-                <BookOpen size={48} className={styles.graphicIcon} />
+                <BookOpen size={40} className={styles.graphicIcon} />
                 <div className={`${styles.ring} ${styles.glow1}`} />
                 <div className={`${styles.ring} ${styles.glow2}`} />
               </div>
@@ -158,48 +156,33 @@ export const DashboardPage: React.FC = () => {
               <div className={styles.guideCard}>
                 <h4>💡 Example questions to try:</h4>
                 <ul>
-                  <li>What are the core methodologies proposed in the paper?</li>
-                  <li>Summarize the primary contributions or results of this paper.</li>
-                  <li>What is Retrieval Augmented Generation (RAG)?</li>
+                  <li onClick={() => handleSuggestedClick("What are the core methodologies proposed in the paper?")}>What are the core methodologies proposed in the paper?</li>
+                  <li onClick={() => handleSuggestedClick("Summarize the primary contributions or results of this paper.")}>Summarize the primary contributions or results of this paper.</li>
+                  <li onClick={() => handleSuggestedClick("What is Retrieval Augmented Generation (RAG)?")}>What is Retrieval Augmented Generation (RAG)?</li>
                 </ul>
               </div>
             </div>
           ) : (
             <div className={styles.messagesList}>
-              {messages.map((msg) => (
-                <ChatBubble 
-                  key={msg.id} 
-                  message={msg}
-                  isPlaying={isPlaying}
-                  playingMessageId={playingMessageId}
-                  onPlayAudio={playMessageAudio}
-                />
-              ))}
+              {messages.map((msg, index) => {
+                const isLast = index === messages.length - 1;
+                const isLastAssistant = isLast && msg.role === 'assistant';
+                return (
+                  <ChatBubble 
+                    key={msg.id} 
+                    message={msg}
+                    isPlaying={isPlaying}
+                    playingMessageId={playingMessageId}
+                    onPlayAudio={playMessageAudio}
+                    suggestedQuestions={isLastAssistant ? suggestedQuestions : undefined}
+                    onSuggestedClick={handleSuggestedClick}
+                  />
+                );
+              })}
               
               {isLoading && !messages.some(msg => msg.role === 'assistant' && (msg.isStreaming || msg.pipelineSteps)) && (
                 <div className={styles.loadingContainer}>
-                  <Loader message="Querying RAG Vector pipeline..." />
-                </div>
-              )}
-
-              {/* Suggestions Panel */}
-              {!isLoading && suggestedQuestions.length > 0 && (
-                <div className={styles.suggestionsContainer}>
-                  <div className={styles.suggestHeader}>
-                    <Sparkles size={13} className={styles.suggestSparkle} />
-                    <span>Suggested follow-up questions:</span>
-                  </div>
-                  <div className={styles.suggestList}>
-                    {suggestedQuestions.map((q, idx) => (
-                      <button
-                        key={idx}
-                        className={styles.suggestCard}
-                        onClick={() => handleSuggestedClick(q)}
-                      >
-                        {q}
-                      </button>
-                    ))}
-                  </div>
+                  <LoadingState label="Querying RAG Vector pipeline..." variant="Drive" />
                 </div>
               )}
 

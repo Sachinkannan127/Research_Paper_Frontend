@@ -1,0 +1,270 @@
+.container {
+  min-height: 15.5rem;
+  width: 100%;
+  max-width: 380px; /* max-w-95 */
+}
+
+.fillWidth {
+  width: 100%;
+}
+
+.paragraph {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-primary);
+}
+
+.cursor {
+  margin-left: 2px;
+  display: inline-block;
+  height: 12px;
+  width: 2px;
+  transform: translateY(2px);
+  border-radius: 9999px;
+  background-color: var(--text-primary);
+  animation: fade-in 150ms ease-out both;
+}
+
+.word {
+  display: inline;
+  will-change: filter, opacity;
+  animation: stream-in 420ms cubic-bezier(0.22, 0.61, 0.25, 1) both;
+}
+
+.sourceChip {
+  margin-left: 0;
+  margin-right: 4px;
+  display: inline-flex;
+  height: 18px; /* h-4.5 */
+  transform: translateY(-1px);
+  align-items: center;
+  gap: 4px;
+  border-radius: 5px;
+  background: var(--bg-secondary, rgba(255, 255, 255, 0.04));
+  padding-right: 3px;
+  padding-left: 3px;
+  vertical-align: middle;
+  font-family: var(--font-mono, monospace);
+  font-size: 10.5px;
+  color: var(--text-secondary);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05); /* shadow-hairline */
+  transition: all 0.15s ease;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.sourceChip:hover {
+  background: var(--bg-tertiary, rgba(255, 255, 255, 0.08));
+  color: var(--text-primary);
+}
+
+.sourceAvatar {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+
+/* Action row */
+.actionRow {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  transition: opacity 400ms ease;
+}
+
+.actionBtn {
+  display: flex;
+  width: 24px;
+  height: 24px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  color: var(--text-muted);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.1s ease;
+}
+
+.actionBtn:hover {
+  background-color: var(--bg-tertiary, rgba(255, 255, 255, 0.05));
+  color: var(--text-secondary);
+}
+
+.sourcesTriggerBtn {
+  margin-left: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 6px;
+  padding: 2px 6px;
+  text-align: left;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.sourcesTriggerBtn:hover {
+  background-color: var(--bg-tertiary, rgba(255, 255, 255, 0.05));
+}
+
+.avatarStack {
+  display: flex;
+}
+
+.avatarStackImg {
+  width: 14px;
+  height: 14px;
+  border-radius: 9999px;
+  background-color: var(--bg-secondary);
+  box-shadow: 0 0 0 1.5px var(--bg-primary);
+  margin-left: -4px;
+}
+
+.avatarStackImg:first-child {
+  margin-left: 0;
+}
+
+.sourcesCountText {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* Sources list */
+.expandableSources {
+  display: grid;
+  transition: grid-template-rows 300ms cubic-bezier(0.23, 1, 0.32, 1), opacity 300ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.sourcesInner {
+  overflow: hidden;
+}
+
+.sourcesListCard {
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  border-radius: 10px;
+  background: var(--bg-tertiary, rgba(255, 255, 255, 0.02));
+  padding: 4px;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+.sourceRowLink {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 6px;
+  padding: 4px 6px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  transition: all 0.15s ease;
+  text-decoration: none;
+}
+
+.sourceRowLink:hover {
+  background-color: var(--bg-secondary, rgba(255, 255, 255, 0.04));
+  color: var(--text-primary);
+}
+
+.sourceRowAvatar {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+}
+
+.animatedUnderline {
+  text-decoration: none;
+}
+
+.sourceDomainText {
+  margin-left: auto;
+  font-family: var(--font-mono, monospace);
+  font-size: 10.5px;
+  color: var(--text-muted);
+}
+
+/* Follow ups */
+.followUpsWrapper {
+  margin-top: 10px;
+  transition: opacity 400ms ease;
+}
+
+.followUpsTitle {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.followUpsList {
+  margin-top: 2px;
+  display: flex;
+  flex-direction: column;
+}
+
+.followUpBtn {
+  margin-left: -6px;
+  margin-right: -6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 7px;
+  border: none;
+  border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.05));
+  padding: 6px;
+  text-align: left;
+  font-size: 12.5px;
+  color: var(--text-primary);
+  background: transparent;
+  cursor: pointer;
+  transition: background-color 0.1s ease;
+}
+
+.followUpBtn:hover {
+  background-color: var(--bg-tertiary, rgba(255, 255, 255, 0.05));
+}
+
+/* Animations */
+@keyframes stream-in {
+  from {
+    filter: blur(4px);
+    opacity: 0;
+  }
+  to {
+    filter: blur(0);
+    opacity: 1;
+  }
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
