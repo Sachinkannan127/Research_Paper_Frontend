@@ -69,7 +69,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           });
 
           if (!res.ok) {
-            throw new Error("Backend verification failed");
+            let detail = "Backend verification failed";
+            try {
+              const errData = await res.json();
+              if (errData && errData.detail) {
+                detail = typeof errData.detail === 'string' ? errData.detail : JSON.stringify(errData.detail);
+              }
+            } catch (_) {}
+            throw new Error(detail);
           }
 
           const data = await res.json();
