@@ -36,7 +36,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             if (signOut) {
               await signOut();
             }
-            const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'https://research-paper-assistant-ylic.onrender.com';
+            const rawApiUrl = import.meta.env.VITE_API_BASE_URL || 'https://research-paper-assistant-ylic.onrender.com';
+            const apiBaseUrl = rawApiUrl.replace(/\/$/, '');
             await fetch(`${apiBaseUrl}/api/auth/logout`, { method: 'POST' });
           } catch (err) {
             console.error("Error signing out for new session:", err);
@@ -55,7 +56,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             throw new Error("Could not retrieve Clerk token");
           }
 
-          const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'https://research-paper-assistant-ylic.onrender.com';
+          const rawApiUrl = import.meta.env.VITE_API_BASE_URL || 'https://research-paper-assistant-ylic.onrender.com';
+          const apiBaseUrl = rawApiUrl.replace(/\/$/, '');
           const res = await fetch(`${apiBaseUrl}/api/auth/verify`, {
             method: 'POST',
             headers: {
