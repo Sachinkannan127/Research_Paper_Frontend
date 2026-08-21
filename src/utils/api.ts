@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://research-paper-assistant-ylic.onrender.com';
 
 let memoryToken: string | null = null;
 let refreshPromise: Promise<string | null> | null = null;

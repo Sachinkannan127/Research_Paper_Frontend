@@ -338,7 +338,7 @@ export const WorkspaceLayout: React.FC = () => {
               className={styles.themeToggleBtn}
               onClick={() => {
                 signOut().then(() => {
-                  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
+                  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'https://research-paper-assistant-ylic.onrender.com';
                   fetch(`${apiBaseUrl}/api/auth/logout`, { method: 'POST' }).finally(() => {
                     navigate('/login');
                   });
