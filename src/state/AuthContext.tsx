@@ -78,10 +78,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setBackendAuthenticated(true);
         } catch (err) {
           console.error("Error syncing with backend:", err);
+          const errorMsg = err instanceof Error ? err.message : String(err);
+          sessionStorage.setItem('backend_sync_error', `Backend sync failed: ${errorMsg}`);
           clearAccessToken();
           setUser(null);
           setBackendAuthenticated(false);
-          // Sign out of Clerk to break redirect loops if backend verify fails
           if (signOut) {
             await signOut();
           }

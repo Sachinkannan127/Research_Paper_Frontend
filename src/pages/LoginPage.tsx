@@ -1,10 +1,20 @@
-import React from 'react';
-import { BookOpen, ShieldCheck } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { BookOpen, ShieldCheck, AlertCircle } from 'lucide-react';
 import { SignIn } from '@clerk/clerk-react';
 import { dark } from '@clerk/themes';
 import styles from './LoginPage.module.css';
 
 export const LoginPage: React.FC = () => {
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const storedError = sessionStorage.getItem('backend_sync_error');
+    if (storedError) {
+      setError(storedError);
+      sessionStorage.removeItem('backend_sync_error');
+    }
+  }, []);
+
   return (
     <div className={styles.container}>
       {/* Left decorative/constellation panel */}
@@ -32,6 +42,27 @@ export const LoginPage: React.FC = () => {
 
       {/* Right Form Card Panel */}
       <div className={styles.formPanel}>
+        {error && (
+          <div style={{
+            margin: '0 24px 16px 24px',
+            padding: '12px 16px',
+            borderRadius: '8px',
+            backgroundColor: 'rgba(239, 68, 68, 0.15)',
+            border: '1px solid rgba(239, 68, 68, 0.3)',
+            color: '#fca5a5',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            fontSize: '14px',
+            fontFamily: 'sans-serif',
+            maxWidth: '400px',
+            width: '100%',
+            boxSizing: 'border-box'
+          }}>
+            <AlertCircle size={18} style={{ color: '#ef4444', flexShrink: 0 }} />
+            <span>{error}</span>
+          </div>
+        )}
         <SignIn 
           signUpUrl="/register" 
           forceRedirectUrl="/workspace/dashboard"
