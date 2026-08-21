@@ -2,7 +2,7 @@ import React, { useState, KeyboardEvent, useRef, useEffect } from 'react';
 import { useSettings } from '../../state/SettingsContext';
 import { useAssistant } from '../../state/AssistantContext';
 import { useChatService } from '../../hooks/useChatService';
-import { ArrowUp, Globe, Trash2, AudioLines } from 'lucide-react';
+import { ArrowUp, Trash2, AudioLines } from 'lucide-react';
 import { useAudioRecorder } from '../../hooks/useAudioRecorder';
 import styles from './ChatInput.module.css';
 

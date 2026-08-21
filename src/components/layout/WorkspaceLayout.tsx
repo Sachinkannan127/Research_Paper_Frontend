@@ -3,7 +3,7 @@ import { Outlet, NavLink, Link, useNavigate } from 'react-router-dom';
 import { useAuth, useUser } from '@clerk/clerk-react';
 import { useBackendAuth } from '../../state/AuthContext';
 import {
-  BookOpen, MessageSquare, Database, UploadCloud,
+  MessageSquare, Database, UploadCloud,
   Settings, User, Activity, RefreshCw, PanelLeftClose, PanelLeft,
   Menu, Plus, Trash2, Edit3, Check, X,
   Sun, Moon, LogOut, Link2

@@ -5,7 +5,7 @@ import { ChatInput } from '../components/chat/ChatInput';
 import { LoadingState } from '../components/common/LoadingState';
 import { useAudioPlayback } from '../hooks/useAudioPlayback';
 import { useSettings } from '../state/SettingsContext';
-import { BookOpen, Download, RotateCcw, Cpu, FileText } from 'lucide-react';
+import { BookOpen, Download, RotateCcw } from 'lucide-react';
 import styles from './DashboardPage.module.css';
 
 export const DashboardPage: React.FC = () => {

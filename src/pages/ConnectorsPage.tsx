@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, RefreshCw, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { useSettings } from '../state/SettingsContext';
-import { apiFetch, getAccessToken } from '../utils/api';
+import { apiFetch } from '../utils/api';
 import styles from './ConnectorsPage.module.css';
 
 // Brand custom SVG icons
