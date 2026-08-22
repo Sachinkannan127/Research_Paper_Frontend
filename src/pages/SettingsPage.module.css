@@ -247,3 +247,73 @@
     text-align: center;
   }
 }
+
+/* PWA Status Badge */
+.statusBadge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.offlineBadge {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.onlineBadge {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+:root[data-theme='light'] .onlineBadge {
+  background: rgba(16, 185, 129, 0.08);
+  color: #059669;
+}
+
+/* PWA Buttons */
+.installBtn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  background: var(--accent-primary);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.installBtn:hover {
+  filter: brightness(1.1);
+  transform: translateY(-0.5px);
+}
+
+.installedLabel {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.checkUpdateBtn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.checkUpdateBtn:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+:root[data-theme='light'] .checkUpdateBtn:hover {
+  background: rgba(0, 0, 0, 0.03);
+}

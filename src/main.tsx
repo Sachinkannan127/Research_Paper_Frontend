@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import { ClerkProvider } from '@clerk/clerk-react'
 import { AuthProvider } from './state/AuthContext.tsx'
+import { PWAProvider } from './state/PWAContext.tsx'
 import './index.css'
 import App from './App.tsx'
 
@@ -15,11 +16,13 @@ if (!PUBLISHABLE_KEY) {
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
-      <AuthProvider>
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      </AuthProvider>
+      <PWAProvider>
+        <AuthProvider>
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
+        </AuthProvider>
+      </PWAProvider>
     </ClerkProvider>
   </StrictMode>,
 )

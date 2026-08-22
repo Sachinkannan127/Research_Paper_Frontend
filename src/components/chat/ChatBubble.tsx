@@ -29,35 +29,54 @@ export const ChatBubble: React.FC<ChatBubbleProps> = ({
   const renderMarkdown = (text: string) => {
     if (!text) return null;
 
-    const lines = text.split('\n');
-    return lines.map((line, index) => {
+    // Split by block-level elements (double newlines)
+    const blocks = text.split(/\n\s*\n/);
+    
+    return blocks.map((block, blockIndex) => {
+      const trimmedBlock = block.trim();
+      if (!trimmedBlock) return null;
+
       // 1. Detect headers
-      if (line.startsWith('### ')) {
-        return <h4 key={index} className={styles.mdH4}>{line.substring(4)}</h4>;
+      if (trimmedBlock.startsWith('### ')) {
+        return <h4 key={blockIndex} className={styles.mdH4}>{parseInlineStyles(trimmedBlock.substring(4))}</h4>;
       }
-      if (line.startsWith('## ')) {
-        return <h3 key={index} className={styles.mdH3}>{line.substring(3)}</h3>;
+      if (trimmedBlock.startsWith('## ')) {
+        return <h3 key={blockIndex} className={styles.mdH3}>{parseInlineStyles(trimmedBlock.substring(3))}</h3>;
       }
-      if (line.startsWith('# ')) {
-        return <h2 key={index} className={styles.mdH2}>{line.substring(2)}</h2>;
+      if (trimmedBlock.startsWith('# ')) {
+        return <h2 key={blockIndex} className={styles.mdH2}>{parseInlineStyles(trimmedBlock.substring(2))}</h2>;
       }
 
-      // 2. Detect bullet points
-      if (line.trim().startsWith('* ') || line.trim().startsWith('- ')) {
+      // 2. Detect bullet list blocks
+      if (trimmedBlock.startsWith('* ') || trimmedBlock.startsWith('- ')) {
+        const items = trimmedBlock.split(/\n\s*[*+-]\s+/);
         return (
-          <ul key={index} className={styles.mdUl}>
-            <li>{parseInlineStyles(line.trim().substring(2))}</li>
+          <ul key={blockIndex} className={styles.mdUl}>
+            {items.map((item, itemIndex) => {
+              const cleanItem = item.replace(/^[*+-]\s+/, '').replace(/\n/g, ' ');
+              return <li key={itemIndex}>{parseInlineStyles(cleanItem)}</li>;
+            })}
           </ul>
         );
       }
 
-      // 3. Keep empty lines tidy
-      if (line.trim() === '') {
-        return <div key={index} className={styles.mdSpacing} />;
+      // 3. Detect numbered list blocks
+      const numberedListRegex = /^\d+\.\s+/;
+      if (numberedListRegex.test(trimmedBlock)) {
+        const items = trimmedBlock.split(/\n\s*\d+\.\s+/);
+        return (
+          <ol key={blockIndex} className={styles.mdOl}>
+            {items.map((item, itemIndex) => {
+              const cleanItem = item.replace(/^\d+\.\s+/, '').replace(/\n/g, ' ');
+              return <li key={itemIndex}>{parseInlineStyles(cleanItem)}</li>;
+            })}
+          </ol>
+        );
       }
 
-      // 4. Default Paragraph
-      return <p key={index} className={styles.mdP}>{parseInlineStyles(line)}</p>;
+      // 4. Default Paragraph (join single newlines to avoid breaking bold markers)
+      const cleanParagraphText = trimmedBlock.replace(/\n/g, ' ');
+      return <p key={blockIndex} className={styles.mdP}>{parseInlineStyles(cleanParagraphText)}</p>;
     });
   };
 

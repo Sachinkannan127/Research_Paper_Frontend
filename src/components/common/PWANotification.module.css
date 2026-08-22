@@ -1,0 +1,162 @@
+/* ── Update Toast ── */
+.updateToast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  width: 360px;
+  padding: 20px;
+  border-radius: 16px;
+  background: rgba(30, 41, 59, 0.7);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5),
+              0 0 1px 1px rgba(255, 255, 255, 0.1) inset;
+  color: var(--text-primary);
+  animation: slideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  font-family: var(--font-sans);
+}
+
+:root[data-theme='light'] .updateToast {
+  background: rgba(255, 255, 255, 0.75);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 10px 40px -10px rgba(15, 23, 42, 0.15),
+              0 0 1px 1px rgba(15, 23, 42, 0.05) inset;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(30px) scale(0.96);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+.toastHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.iconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: rgba(16, 163, 127, 0.15);
+  color: var(--accent-primary);
+}
+
+.updateIcon {
+  animation: rotate 6s linear infinite;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.toastTitle {
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.toastBody {
+  font-size: 0.825rem;
+  line-height: 1.45;
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+}
+
+.toastActions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.updateBtn {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: none;
+  background: var(--accent-primary);
+  color: #ffffff;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.updateBtn:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.dismissBtn {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dismissBtn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+}
+
+:root[data-theme='light'] .dismissBtn:hover {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+/* ── Offline Banner ── */
+.offlineBanner {
+  background: rgba(245, 158, 11, 0.08);
+  border-bottom: 1px solid rgba(245, 158, 11, 0.2);
+  width: 100%;
+  padding: 8px 16px;
+  animation: pulseBg 4s infinite ease-in-out;
+}
+
+@keyframes pulseBg {
+  0%, 100% { background: rgba(245, 158, 11, 0.06); }
+  50% { background: rgba(245, 158, 11, 0.12); }
+}
+
+.offlineContent {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 0.775rem;
+  color: #f59e0b;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.offlineIcon {
+  flex-shrink: 0;
+}
+
+/* Mobile Media Queries */
+@media (max-width: 480px) {
+  .updateToast {
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    width: auto;
+  }
+}

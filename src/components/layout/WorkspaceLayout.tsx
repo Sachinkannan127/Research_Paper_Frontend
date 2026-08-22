@@ -6,12 +6,14 @@ import {
   MessageSquare, Database, UploadCloud,
   Settings, User, Activity, RefreshCw, PanelLeftClose, PanelLeft,
   Menu, Plus, Trash2, Edit3, Check, X,
-  Sun, Moon, LogOut, Link2
+  Sun, Moon, LogOut, Link2, DownloadCloud
 } from 'lucide-react';
 import { useSettings } from '../../state/SettingsContext';
 import { useServerHealth } from '../../hooks/useServerHealth';
 import { CitationInspector } from '../inspector/CitationInspector';
 import { useAssistant } from '../../state/AssistantContext';
+import { usePWA } from '../../state/PWAContext';
+import { PWANotification, OfflineBanner } from '../common/PWANotification';
 import styles from './WorkspaceLayout.module.css';
 
 const NAV_ITEMS = [
@@ -42,6 +44,7 @@ export const WorkspaceLayout: React.FC = () => {
     renameSession,
   } = useAssistant();
   const serverStatus = useServerHealth();
+  const { isInstallable, installApp } = usePWA();
 
   useEffect(() => {
     if (isLoaded && !isLoading) {
@@ -119,9 +122,11 @@ export const WorkspaceLayout: React.FC = () => {
   const StatusIcon = serverStatus === 'checking' ? RefreshCw : Activity;
 
   return (
-    <div className={styles.shell}>
-      {/* Backdrop for mobile drawer */}
-      {mobileSidebarOpen && (
+    <div className={styles.layoutWrapper}>
+      <OfflineBanner />
+      <div className={styles.shell}>
+        {/* Backdrop for mobile drawer */}
+        {mobileSidebarOpen && (
         <div
           className={styles.backdrop}
           onClick={() => setMobileSidebarOpen(false)}
@@ -288,6 +293,28 @@ export const WorkspaceLayout: React.FC = () => {
           </div>
         </div>
 
+        {/* Install Desktop App Widget */}
+        {isInstallable && (
+          !collapsed ? (
+            <div className={styles.installCard}>
+              <span className={styles.installCardTitle}>Install Desktop App</span>
+              <p className={styles.installCardDesc}>Enjoy a dedicated window, faster loads, and offline session access.</p>
+              <button className={styles.installCardBtn} onClick={installApp}>
+                <DownloadCloud size={13} style={{ marginRight: '6px' }} />
+                Install App
+              </button>
+            </div>
+          ) : (
+            <button
+              className={styles.installBtnCollapsed}
+              onClick={installApp}
+              title="Install Desktop App"
+            >
+              <DownloadCloud size={16} />
+            </button>
+          )
+        )}
+
         {/* Footer status */}
         <div className={styles.sidebarFooter}>
           <div className={styles.footerRow} style={{ gap: '10px' }}>
@@ -368,6 +395,8 @@ export const WorkspaceLayout: React.FC = () => {
           </div>
         </div>
       </div>
+      </div>
+      <PWANotification />
     </div>
   );
 };

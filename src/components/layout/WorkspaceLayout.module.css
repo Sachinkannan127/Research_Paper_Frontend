@@ -1,8 +1,9 @@
 /* ── Shell ── */
 .shell {
   display: flex;
-  width: 100vw;
-  height: 100vh;
+  flex: 1;
+  width: 100%;
+  min-height: 0;
   overflow: hidden;
   background: var(--bg-primary);
 }
@@ -630,6 +631,120 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* ── PWA & Standalone Adjustments ── */
+.layoutWrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--bg-primary);
+}
+
+.installCard {
+  margin: 12px 0;
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(16, 163, 127, 0.04);
+  border: 1px solid rgba(16, 163, 127, 0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  animation: fadeIn 0.3s ease;
+}
+
+:root[data-theme='light'] .installCard {
+  background: rgba(79, 70, 229, 0.04);
+  border: 1px solid rgba(79, 70, 229, 0.12);
+}
+
+.installCardTitle {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--accent-primary);
+}
+
+.installCardDesc {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  line-height: 1.35;
+}
+
+.installCardBtn {
+  margin-top: 4px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: none;
+  background: var(--accent-primary);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.installCardBtn:hover {
+  filter: brightness(1.1);
+  transform: translateY(-0.5px);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.installBtnCollapsed {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(16, 163, 127, 0.08);
+  border: 1px solid rgba(16, 163, 127, 0.2);
+  color: var(--accent-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin: 12px 0;
+  flex-shrink: 0;
+}
+
+:root[data-theme='light'] .installBtnCollapsed {
+  background: rgba(79, 70, 229, 0.08);
+  border: 1px solid rgba(79, 70, 229, 0.2);
+}
+
+.installBtnCollapsed:hover {
+  background: var(--accent-primary);
+  color: #fff;
+  transform: scale(1.05);
+}
+
+@media (display-mode: standalone) {
+  .topHeader {
+    padding-top: calc(env(safe-area-inset-top, 0px) + 6px) !important;
+    height: calc(var(--header-height) + env(safe-area-inset-top, 0px)) !important;
+  }
+  
+  .sidebar {
+    padding-top: calc(env(safe-area-inset-top, 0px) + 20px) !important;
+  }
+
+  .shell {
+    height: 100dvh !important;
+  }
+
+  /* Prevent pull to refresh rubber-banding on viewport scroll */
+  body, html, #root, .layoutWrapper {
+    overscroll-behavior-y: contain;
+  }
 }
 
 

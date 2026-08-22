@@ -422,3 +422,13 @@
   border-color: rgba(255, 255, 255, 0.15);
   color: var(--text-primary);
 }
+
+.mdOl {
+  margin: 8px 0 16px 20px;
+  padding: 0;
+  list-style-type: decimal;
+}
+
+.mdOl li {
+  margin-bottom: 6px;
+}

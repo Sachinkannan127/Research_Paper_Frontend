@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { SlidersHorizontal, Key, ToggleRight, ToggleLeft } from 'lucide-react';
+import { SlidersHorizontal, Key, ToggleRight, ToggleLeft, Laptop } from 'lucide-react';
 import { useSettings } from '../state/SettingsContext';
+import { usePWA } from '../state/PWAContext';
 import styles from './SettingsPage.module.css';
 
 export const SettingsPage: React.FC = () => {
@@ -10,6 +11,28 @@ export const SettingsPage: React.FC = () => {
   const [telemetry, setTelemetry] = useState(true);
   const [geminiKey, setGeminiKey] = useState('');
   const [mistralKey, setMistralKey] = useState('');
+
+  const { isOffline, isInstallable, isStandalone, installApp } = usePWA();
+
+  const handleCheckForUpdates = () => {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(registrations => {
+        if (registrations.length === 0) {
+          alert('Browser Client Mode: No service worker registered.');
+          return;
+        }
+        for (let registration of registrations) {
+          registration.update().then(() => {
+            alert('Service Worker update check complete! If a new version was found, a prompt will appear.');
+          }).catch(err => {
+            console.error('Update check failed:', err);
+          });
+        }
+      });
+    } else {
+      alert('Service Worker updates not supported in this browser.');
+    }
+  };
 
   return (
     <div className={styles.page}>
@@ -140,6 +163,63 @@ export const SettingsPage: React.FC = () => {
             </button>
           </div>
         ))}
+      </section>
+
+      {/* App Integration & PWA status section */}
+      <section className={styles.section}>
+        <div className={styles.sectionHeader}>
+          <Laptop size={16} className={styles.sectionIcon} />
+          <h3>App Status & Integration</h3>
+        </div>
+
+        <div className={styles.settingRow}>
+          <div className={styles.settingMeta}>
+            <span className={styles.settingLabel}>Network Connectivity</span>
+            <span className={styles.settingDesc}>
+              {isOffline 
+                ? 'Currently offline. Relying on local cached sessions and offline index.' 
+                : 'Online connection active. Able to access remote AI models and full vector stores.'}
+            </span>
+          </div>
+          <span className={`${styles.statusBadge} ${isOffline ? styles.offlineBadge : styles.onlineBadge}`}>
+            {isOffline ? 'Offline' : 'Connected'}
+          </span>
+        </div>
+
+        <div className={styles.settingRow}>
+          <div className={styles.settingMeta}>
+            <span className={styles.settingLabel}>Desktop App Standalone</span>
+            <span className={styles.settingDesc}>
+              {isStandalone 
+                ? 'Running inside a native app shell. Titlebars, safe regions, and gestures are optimized.' 
+                : isInstallable 
+                  ? 'Add Research Explorer to your home screen or system dock for offline integration.' 
+                  : 'Installed or running in unsupported PWA browser client.'}
+            </span>
+          </div>
+          {isInstallable && (
+            <button className={styles.installBtn} onClick={installApp}>
+              Install App
+            </button>
+          )}
+          {!isInstallable && (
+            <span className={styles.installedLabel}>
+              {isStandalone ? 'Standalone Shell' : 'Browser Tab'}
+            </span>
+          )}
+        </div>
+
+        <div className={styles.settingRow}>
+          <div className={styles.settingMeta}>
+            <span className={styles.settingLabel}>Application Cache Updates</span>
+            <span className={styles.settingDesc}>
+              Force reload resources from deployment server.
+            </span>
+          </div>
+          <button className={styles.checkUpdateBtn} onClick={handleCheckForUpdates}>
+            Check Updates
+          </button>
+        </div>
       </section>
     </div>
   );
