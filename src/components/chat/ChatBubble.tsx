@@ -38,13 +38,13 @@ export const ChatBubble: React.FC<ChatBubbleProps> = ({
 
       // 1. Detect headers
       if (trimmedBlock.startsWith('### ')) {
-        return <h4 key={blockIndex} className={styles.mdH4}>{parseInlineStyles(trimmedBlock.substring(4))}</h4>;
+        return <h4 key={blockIndex} className={styles.mdH4}>{parseInlineStyles(trimmedBlock.substring(4), blockIndex)}</h4>;
       }
       if (trimmedBlock.startsWith('## ')) {
-        return <h3 key={blockIndex} className={styles.mdH3}>{parseInlineStyles(trimmedBlock.substring(3))}</h3>;
+        return <h3 key={blockIndex} className={styles.mdH3}>{parseInlineStyles(trimmedBlock.substring(3), blockIndex)}</h3>;
       }
       if (trimmedBlock.startsWith('# ')) {
-        return <h2 key={blockIndex} className={styles.mdH2}>{parseInlineStyles(trimmedBlock.substring(2))}</h2>;
+        return <h2 key={blockIndex} className={styles.mdH2}>{parseInlineStyles(trimmedBlock.substring(2), blockIndex)}</h2>;
       }
 
       // 2. Detect bullet list blocks
@@ -54,7 +54,7 @@ export const ChatBubble: React.FC<ChatBubbleProps> = ({
           <ul key={blockIndex} className={styles.mdUl}>
             {items.map((item, itemIndex) => {
               const cleanItem = item.replace(/^[*+-]\s+/, '').replace(/\n/g, ' ');
-              return <li key={itemIndex}>{parseInlineStyles(cleanItem)}</li>;
+              return <li key={itemIndex}>{parseInlineStyles(cleanItem, `${blockIndex}-${itemIndex}`)}</li>;
             })}
           </ul>
         );
@@ -68,7 +68,7 @@ export const ChatBubble: React.FC<ChatBubbleProps> = ({
           <ol key={blockIndex} className={styles.mdOl}>
             {items.map((item, itemIndex) => {
               const cleanItem = item.replace(/^\d+\.\s+/, '').replace(/\n/g, ' ');
-              return <li key={itemIndex}>{parseInlineStyles(cleanItem)}</li>;
+              return <li key={itemIndex}>{parseInlineStyles(cleanItem, `${blockIndex}-${itemIndex}`)}</li>;
             })}
           </ol>
         );
@@ -76,11 +76,11 @@ export const ChatBubble: React.FC<ChatBubbleProps> = ({
 
       // 4. Default Paragraph (join single newlines to avoid breaking bold markers)
       const cleanParagraphText = trimmedBlock.replace(/\n/g, ' ');
-      return <p key={blockIndex} className={styles.mdP}>{parseInlineStyles(cleanParagraphText)}</p>;
+      return <p key={blockIndex} className={styles.mdP}>{parseInlineStyles(cleanParagraphText, blockIndex)}</p>;
     });
   };
 
-  const parseInlineStyles = (chunkText: string) => {
+  const parseInlineStyles = (chunkText: string, baseKey: string | number) => {
     // Split by markdown links: [linkText](linkUrl)
     const linkRegex = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g;
     const parts = chunkText.split(linkRegex);
@@ -92,13 +92,13 @@ export const ChatBubble: React.FC<ChatBubbleProps> = ({
       const linkUrl = parts[i + 2];
       
       if (textBefore) {
-        renderedElements.push(...parseBoldAndCitations(textBefore));
+        renderedElements.push(...parseBoldAndCitations(textBefore, baseKey, i));
       }
       
       if (linkText && linkUrl) {
         renderedElements.push(
           <a 
-            key={`link-${i}`} 
+            key={`link-${baseKey}-${i}`} 
             href={linkUrl} 
             target="_blank" 
             rel="noopener noreferrer" 
@@ -113,25 +113,25 @@ export const ChatBubble: React.FC<ChatBubbleProps> = ({
     return renderedElements;
   };
 
-  const parseBoldAndCitations = (text: string) => {
+  const parseBoldAndCitations = (text: string, baseKey: string | number, linkIndex: number) => {
     const boldParts = text.split(/\*\*([^*]+)\*\*/g);
-    return boldParts.map((part, index) => {
-      if (index % 2 === 1) {
-        return <strong key={index} className={styles.boldText}>{part}</strong>;
+    return boldParts.map((part, boldIndex) => {
+      if (boldIndex % 2 === 1) {
+        return <strong key={`bold-${baseKey}-${linkIndex}-${boldIndex}`} className={styles.boldText}>{part}</strong>;
       }
-      return parseCitations(part);
+      return parseCitations(part, baseKey, linkIndex, boldIndex);
     });
   };
 
-  const parseCitations = (text: string) => {
+  const parseCitations = (text: string, baseKey: string | number, linkIndex: number, boldIndex: number) => {
     // Parse citation links like [1] or matches to source lists:
     const citationRegex = /\[(\d+)\]/g;
     const parts = text.split(citationRegex);
     if (parts.length <= 1) return text;
 
-    return parts.map((part, index) => {
+    return parts.map((part, citeIndex) => {
       // Odd indices are the digits captured (e.g. 1, 2)
-      if (index % 2 === 1) {
+      if (citeIndex % 2 === 1) {
         const citationNum = parseInt(part, 10);
         // Map citation number to target chunk index: [1] -> chunk 0
         const chunkIndex = citationNum - 1;
@@ -141,7 +141,7 @@ export const ChatBubble: React.FC<ChatBubbleProps> = ({
           const isSelected = activeChunk?.text === targetChunk.text;
           return (
             <button
-              key={index}
+              key={`cite-${baseKey}-${linkIndex}-${boldIndex}-${citeIndex}`}
               className={`${styles.citationBadge} ${isSelected ? styles.citationBadgeActive : ''}`}
               onClick={() => setActiveChunk(targetChunk)}
               title="Click to view full reference context"
