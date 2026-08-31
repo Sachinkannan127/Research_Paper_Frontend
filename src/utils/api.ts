@@ -1,4 +1,4 @@
-const rawApiUrl = import.meta.env.VITE_API_BASE_URL || 'https://research-paper-assistant-ylic.onrender.com';
+const rawApiUrl = import.meta.env.VITE_API_BASE_URL || 'https://research-paper-backend-1ub4.onrender.com';
 const API_BASE_URL = rawApiUrl.replace(/\/$/, '');
 
 let memoryToken: string | null = null;

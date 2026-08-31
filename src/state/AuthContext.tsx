@@ -36,7 +36,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             if (signOut) {
               await signOut();
             }
-            const rawApiUrl = import.meta.env.VITE_API_BASE_URL || 'https://research-paper-assistant-ylic.onrender.com';
+            const rawApiUrl = import.meta.env.VITE_API_BASE_URL || 'https://research-paper-backend-1ub4.onrender.com';
             const apiBaseUrl = rawApiUrl.replace(/\/$/, '');
             await fetch(`${apiBaseUrl}/api/auth/logout`, { method: 'POST' });
           } catch (err) {
@@ -56,7 +56,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             throw new Error("Could not retrieve Clerk token");
           }
 
-          const rawApiUrl = import.meta.env.VITE_API_BASE_URL || 'https://research-paper-assistant-ylic.onrender.com';
+          const rawApiUrl = import.meta.env.VITE_API_BASE_URL || 'https://research-paper-backend-1ub4.onrender.com';
           const apiBaseUrl = rawApiUrl.replace(/\/$/, '');
           const res = await fetch(`${apiBaseUrl}/api/auth/verify`, {
             method: 'POST',
