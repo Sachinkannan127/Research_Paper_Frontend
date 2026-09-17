@@ -25,7 +25,7 @@ const navItems = [
 ];
 
 export const Sidebar: React.FC<SidebarProps> = ({ collapsed, serverStatus }) => {
-  const { model } = useSettings();
+  const { model, activePdfName } = useSettings();
 
   const statusLabel =
     serverStatus === 'online'
@@ -45,7 +45,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed, serverStatus }) => 
     <aside className={`${styles.sidebar} ${collapsed ? styles.sidebarCollapsed : ''}`}>
       <div className={styles.documentChip}>
         <div className={styles.docLabel}>Active Document</div>
-        <div className={styles.docName}>Research_paper.pdf</div>
+        <div className={styles.docName}>{activePdfName || 'No PDF Uploaded'}</div>
       </div>
 
       <nav className={styles.nav}>

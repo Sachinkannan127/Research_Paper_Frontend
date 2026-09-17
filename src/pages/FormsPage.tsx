@@ -14,7 +14,7 @@ interface IngestionStep {
 }
 
 export const FormsPage: React.FC = () => {
-  const { apiBaseUrl, refreshConfig } = useSettings();
+  const { apiBaseUrl, refreshConfig, setActivePdfName } = useSettings();
   const [isDragging, setIsDragging] = useState(false);
   const [fileObject, setFileObject] = useState<File | null>(null);
   const [uploadedFile, setUploadedFile] = useState<string | null>(null);
@@ -46,7 +46,10 @@ export const FormsPage: React.FC = () => {
           if (data.system_prompt) setSystemPrompt(data.system_prompt);
           if (data.welcome_message) setWelcomeMsg(data.welcome_message);
           if (data.similarity_metric) setSimilarityMetric(data.similarity_metric);
-          if (data.active_pdf_name) setUploadedFile(data.active_pdf_name);
+          if (data.active_pdf_name) {
+            setUploadedFile(data.active_pdf_name);
+            setActivePdfName(data.active_pdf_name);
+          }
         }
       } catch (err) {
         console.error('Failed to fetch config', err);
@@ -54,7 +57,7 @@ export const FormsPage: React.FC = () => {
     };
     fetchConfig();
     return () => { isMounted = false; };
-  }, [apiBaseUrl]);
+  }, [apiBaseUrl, setActivePdfName]);
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
@@ -63,6 +66,7 @@ export const FormsPage: React.FC = () => {
     if (file?.name.endsWith('.pdf')) {
       setFileObject(file);
       setUploadedFile(file.name);
+      setActivePdfName(file.name);
     }
   };
 
@@ -71,6 +75,7 @@ export const FormsPage: React.FC = () => {
     if (file) {
       setFileObject(file);
       setUploadedFile(file.name);
+      setActivePdfName(file.name);
     }
   };
 

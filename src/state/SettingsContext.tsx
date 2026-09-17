@@ -15,6 +15,7 @@ interface SettingsContextType {
   resetPreferences: () => void;
   clearLocalData: () => void;
   activePdfName: string;
+  setActivePdfName: (name: string) => void;
   refreshConfig: () => Promise<void>;
   voiceAutoplay: boolean;
   setVoiceAutoplay: (value: boolean) => void;
@@ -45,7 +46,14 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     return saved === 'light' ? 'light' : 'dark';
   });
 
-  const [activePdfName, setActivePdfName] = useState<string>('Research_paper.pdf');
+  const [activePdfName, setActivePdfNameBase] = useState<string>(() => {
+    return localStorage.getItem('assistant_active_pdf_name') || 'Research_paper.pdf';
+  });
+
+  const setActivePdfName = (name: string) => {
+    localStorage.setItem('assistant_active_pdf_name', name);
+    setActivePdfNameBase(name);
+  };
 
   const rawApiUrl = import.meta.env.VITE_API_BASE_URL || `https://research-paper-backend-w5dq.onrender.com`;
   const apiBaseUrl = rawApiUrl.replace('localhost', '127.0.0.1').replace(/\/$/, '');
@@ -142,6 +150,7 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         resetPreferences,
         clearLocalData,
         activePdfName,
+        setActivePdfName,
         refreshConfig,
         voiceAutoplay,
         setVoiceAutoplay,
