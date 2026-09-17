@@ -46,32 +46,36 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     return saved === 'light' ? 'light' : 'dark';
   });
 
-  const [activePdfName, setActivePdfNameBase] = useState<string>(() => {
-    const saved = localStorage.getItem('assistant_active_pdf_name');
-    if (!saved || saved === 'Research_paper.pdf' || saved === 'Research_paper_3.pdf') {
-      return 'No PDF Uploaded';
-    }
-    return saved;
-  });
-
-  const setActivePdfName = (name: string) => {
-    localStorage.setItem('assistant_active_pdf_name', name);
-    setActivePdfNameBase(name);
-  };
-
   const rawApiUrl = import.meta.env.VITE_API_BASE_URL || `https://research-paper-backend-w5dq.onrender.com`;
   const apiBaseUrl = rawApiUrl.replace('localhost', '127.0.0.1').replace(/\/$/, '');
 
-  const { backendAuthenticated } = useBackendAuth();
+  const { backendAuthenticated, user } = useBackendAuth();
+
+  const getStorageKey = (clerkId?: string) => {
+    return clerkId ? `assistant_active_pdf_${clerkId}` : 'assistant_active_pdf_name';
+  };
+
+  const [activePdfName, setActivePdfNameBase] = useState<string>('No PDF Uploaded');
+
+  const setActivePdfName = (name: string) => {
+    const key = getStorageKey(user?.clerk_id);
+    localStorage.setItem(key, name);
+    setActivePdfNameBase(name);
+  };
 
   const refreshConfig = async () => {
-    if (!backendAuthenticated) return;
+    if (!backendAuthenticated) {
+      setActivePdfNameBase('No PDF Uploaded');
+      return;
+    }
     try {
       const res = await apiFetch(`${apiBaseUrl}/config`);
       if (res.ok) {
         const data = await res.json();
-        if (data.active_pdf_name) {
-          setActivePdfName(data.active_pdf_name);
+        const pdfName = data.active_pdf_name || 'No PDF Uploaded';
+        setActivePdfNameBase(pdfName);
+        if (user?.clerk_id) {
+          localStorage.setItem(getStorageKey(user.clerk_id), pdfName);
         }
       }
     } catch (e) {
@@ -80,8 +84,19 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   };
 
   React.useEffect(() => {
-    refreshConfig();
-  }, [apiBaseUrl, backendAuthenticated]);
+    if (!backendAuthenticated) {
+      setActivePdfNameBase('No PDF Uploaded');
+    } else {
+      const userKey = getStorageKey(user?.clerk_id);
+      const cached = localStorage.getItem(userKey);
+      if (cached && cached !== 'Research_paper.pdf' && cached !== 'Research_paper_3.pdf') {
+        setActivePdfNameBase(cached);
+      } else {
+        setActivePdfNameBase('No PDF Uploaded');
+      }
+      refreshConfig();
+    }
+  }, [apiBaseUrl, backendAuthenticated, user?.clerk_id]);
 
   React.useEffect(() => {
     console.log("[Theme Context] useEffect trigger - Setting data-theme on html to:", theme);
