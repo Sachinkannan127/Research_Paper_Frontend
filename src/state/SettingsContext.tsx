@@ -47,7 +47,11 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   });
 
   const [activePdfName, setActivePdfNameBase] = useState<string>(() => {
-    return localStorage.getItem('assistant_active_pdf_name') || 'Research_paper.pdf';
+    const saved = localStorage.getItem('assistant_active_pdf_name');
+    if (!saved || saved === 'Research_paper.pdf' || saved === 'Research_paper_3.pdf') {
+      return 'No PDF Uploaded';
+    }
+    return saved;
   });
 
   const setActivePdfName = (name: string) => {
